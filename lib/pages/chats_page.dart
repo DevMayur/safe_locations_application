@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:safe_locations_application/widgets/custom_list_view_tiles.dart';
 
 //providers
 import '../provider/authentication_provider.dart';
@@ -49,9 +50,28 @@ class _ChatsPageState extends State<ChatsPage> {
             onPressed: () {
               _auth.logOut();
             },
-          ),),
+          ),
+          ),
+          _chatsList(),
         ],
       ),
     );
   }
+
+
+  Widget _chatsList() {
+    return Expanded(child: _chatTile(),);
+  }
+
+  Widget _chatTile() {
+    return CustomListViewTileWithActivity(
+        height: _deviceHeight * 0.10,
+        title: "Mayur Kakade",
+        subtitle: "hey, how are you ?",
+        imagePath: "https://avatars.githubusercontent.com/u/33338924?v=4",
+        isActive: false,
+        isActivity: false,
+        onTap: () {});
+  }
+
 }
