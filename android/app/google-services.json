@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "973418575725",
+    "project_id": "safe-location-chat-321b2",
+    "storage_bucket": "safe-location-chat-321b2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973418575725:android:b27e3b36f4703344b6cc64",
+        "android_client_info": {
+          "package_name": "com.example.safe_locations_application"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "973418575725-1k1539sne1apsnr0416kbj0i99rpqoej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxsYJDkXIaHXUx_9C8ZybDmHjy221FhQM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "973418575725-1k1539sne1apsnr0416kbj0i99rpqoej.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "973418575725-3n5cn67epu6lmfu4uucmbhu4p0gpuld8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.mayurkakade.safelocation"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
