@@ -2,6 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:safe_locations_application/models/chat_message.dart';
+import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/widgets/custom_list_view_tiles.dart';
 
 //providers
@@ -10,6 +12,15 @@ import '../provider/chats_page_provider.dart';
 
 //Widgets
 import '../widgets/top_bar.dart';
+
+//models
+import '../models/chat.dart';
+
+//services
+import '../services/navigation_service.dart';
+
+//pages
+import '../pages/chat_page.dart';
 
 class ChatsPage extends StatefulWidget {
   @override
@@ -24,12 +35,14 @@ class _ChatsPageState extends State<ChatsPage> {
 
   late AuthenticationProvider _auth;
   late ChatsPageProvider _pageProvider;
+  late NavigationService _navigation;
 
   @override
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
+    _navigation = GetIt.instance.get<NavigationService>();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<ChatsPageProvider>(
@@ -75,19 +88,59 @@ class _ChatsPageState extends State<ChatsPage> {
   }
 
   Widget _chatsList() {
+    List<Chat>? _chats = _pageProvider.chats;
     return Expanded(
-      child: _chatTile(),
+      child: (() {
+        if(_chats != null) {
+          if(_chats.length != 0)
+          {
+            return ListView.builder(
+                itemCount: _chats.length,
+                itemBuilder: (BuildContext _context, int _index) {
+                  return _chatTile(_chats[_index]);
+                }
+            );
+          }
+          else
+          {
+            return const Center(
+              child: Text(
+                "No Chats Found",
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
+            );
+          }
+        } else {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Colors.white,
+            ),
+          );
+        }
+      })(),
     );
   }
 
-  Widget _chatTile() {
+  Widget _chatTile(Chat _chat) {
+    List<ChatUser> _recepients =_chat.recepients();
+    bool _isActive = _recepients.any((_d) => _d.wasRecentlyActive());
+    String _subtitleText = "";
+    if (_chat.messages.isNotEmpty) {
+      _subtitleText = _chat.messages.first.type != MessageType.TEXT ? "Media Attachment" : _chat.messages.first.content;
+    }
     return CustomListViewTileWithActivity(
         height: _deviceHeight * 0.10,
-        title: "Mayur Kakade",
-        subtitle: "hey, how are you ?",
-        imagePath: "https://avatars.githubusercontent.com/u/33338924?v=4",
-        isActive: false,
-        isActivity: false,
-        onTap: () {});
+        title: _chat.title(),
+        subtitle: _subtitleText,
+        imagePath: _chat.imageURL(),
+        isActive: _isActive,
+        isActivity: _chat.activity,
+        onTap: () {
+          _navigation.navigateToPage(
+              ChatPage(chat: _chat),
+          );
+        });
   }
 }

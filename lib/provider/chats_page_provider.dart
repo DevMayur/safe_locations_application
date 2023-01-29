@@ -49,6 +49,7 @@ class ChatsPageProvider extends ChangeNotifier {
             DocumentSnapshot _userSnapshot = await _db.getUser(_uid);
             Map<String, dynamic> _userData =
                 _userSnapshot.data() as Map<String, dynamic>;
+            _userData["uid"] = _userSnapshot.id;
             _members.add(ChatUser.fromJSON(_userData));
           }
 
