@@ -30,6 +30,8 @@ class ChatPageProvider extends ChangeNotifier {
   String _chatId;
   List<ChatMessage>? messages;
 
+  late StreamSubscription _messagesStream;
+
   String? _message;
 
   String getMessage() {
@@ -41,12 +43,32 @@ class ChatPageProvider extends ChangeNotifier {
     _storage = GetIt.instance.get<CloudStorageService>();
     _media = GetIt.instance.get<MediaService>();
     _navigation = GetIt.instance.get<NavigationService>();
+    listenToMessages();
   }
 
 
   @override
   void dispose() {
+    _messagesStream.cancel();
     super.dispose();
+  }
+
+  void listenToMessages() {
+    try {
+      _db.streamMessagesForChat(_chatId).listen((_snapshot) {
+        List<ChatMessage> _messages = _snapshot.docs.map(
+                (_m) {
+          Map<String, dynamic> _messageData = _m.data() as Map<String, dynamic>;
+          return ChatMessage.fromJSON(_messageData);
+        }).toList();
+        messages = _messages;
+        notifyListeners();
+        //Add scroll to bottom call
+      });
+    } catch (e) {
+      print("Error getting messages");
+      print(e);
+    }
   }
 
   void goBack() {
