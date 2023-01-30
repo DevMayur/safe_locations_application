@@ -31,11 +31,17 @@ class ChatPageProvider extends ChangeNotifier {
   List<ChatMessage>? messages;
 
   late StreamSubscription _messagesStream;
+  late StreamSubscription _keyboardVisibilityStream;
+  late KeyboardVisibilityController _keyboardVisibilityController;
 
   String? _message;
 
-  String getMessage() {
+  String get message {
     return _message!;
+  }
+
+  void set message(String _value) {
+    _message = _value;
   }
 
   ChatPageProvider(this._chatId, this._auth, this._messageListViewController) {
@@ -43,9 +49,10 @@ class ChatPageProvider extends ChangeNotifier {
     _storage = GetIt.instance.get<CloudStorageService>();
     _media = GetIt.instance.get<MediaService>();
     _navigation = GetIt.instance.get<NavigationService>();
+    _keyboardVisibilityController = KeyboardVisibilityController();
     listenToMessages();
+    listenToKeyboardChanges();
   }
-
 
   @override
   void dispose() {
@@ -55,15 +62,20 @@ class ChatPageProvider extends ChangeNotifier {
 
   void listenToMessages() {
     try {
-      _db.streamMessagesForChat(_chatId).listen((_snapshot) {
-        List<ChatMessage> _messages = _snapshot.docs.map(
-                (_m) {
+      _messagesStream = _db.streamMessagesForChat(_chatId).listen((_snapshot) {
+        List<ChatMessage> _messages = _snapshot.docs.map((_m) {
           Map<String, dynamic> _messageData = _m.data() as Map<String, dynamic>;
           return ChatMessage.fromJSON(_messageData);
         }).toList();
         messages = _messages;
         notifyListeners();
         //Add scroll to bottom call
+        WidgetsBinding.instance!.addPostFrameCallback((_) {
+          if (_messageListViewController.hasClients) {
+            _messageListViewController
+                .jumpTo(_messageListViewController.position.maxScrollExtent);
+          }
+        });
       });
     } catch (e) {
       print("Error getting messages");
@@ -71,8 +83,53 @@ class ChatPageProvider extends ChangeNotifier {
     }
   }
 
+
+  void listenToKeyboardChanges() {
+    _keyboardVisibilityStream = _keyboardVisibilityController.onChange.listen((_event) {
+      _db.updateChatData(_chatId, {
+        "is_activity": _event
+      });
+    });
+  }
+
+  void deleteChat() {
+    goBack();
+    _db.deleteChat(_chatId);
+  }
+
+  void sendTextMessage() {
+    if (_message != null) {
+      ChatMessage _messageToSend = ChatMessage(
+          content: _message!,
+          type: MessageType.TEXT,
+          senderID: _auth.user.uid,
+          sentTime: DateTime.now());
+      _db.addMessageToChat(_chatId, _messageToSend);
+    }
+  }
+
+  void sendImageMessage() async {
+    try {
+      PlatformFile? _file = await _media.pickImageFromLibrary();
+      if (_file != null) {
+        String? _downloadURL = await _storage.saveChatImageToStorage(
+            _chatId, _auth.user.uid, _file);
+
+        ChatMessage _messageToSend = ChatMessage(
+            content: _downloadURL!,
+            type: MessageType.IMAGE,
+            senderID: _auth.user.uid,
+            sentTime: DateTime.now());
+
+        _db.addMessageToChat(_chatId, _messageToSend);
+      }
+    } catch (e) {
+      print("Error sending image message");
+      print(e);
+    }
+  }
+
   void goBack() {
     _navigation.goBack();
   }
-
 }

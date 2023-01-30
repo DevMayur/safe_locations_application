@@ -88,14 +88,19 @@ class _ChatPageState extends State<ChatPage> {
                   fontSize: 12,
                   primaryAction: IconButton(
                     icon: const Icon(Icons.delete, color: Color.fromRGBO(0, 82, 218, 1.0),),
-                    onPressed: () {},
+                    onPressed: () {
+                      _pageProvider.deleteChat();
+                    },
                   ),
                   secondaryAction: IconButton(
                     icon: const Icon(Icons.arrow_back, color: Color.fromRGBO(0, 82, 218, 1.0),),
-                    onPressed: () {},
+                    onPressed: () {
+                      _pageProvider.goBack();
+                    },
                   ),
                 ),
-
+                _messagesListView(),
+                _sendMessageForm(),
               ],
             ),
           ),
@@ -104,4 +109,126 @@ class _ChatPageState extends State<ChatPage> {
     });
   }
 
+  Widget _messagesListView() {
+    if (_pageProvider.messages != null) {
+      if (_pageProvider.messages!.isNotEmpty) {
+        return Container(
+          height: _deviceHeight * 0.74,
+          child: ListView.builder(
+            controller: _messagesListViewController,
+              itemCount: _pageProvider.messages!.length,
+              itemBuilder: (BuildContext _context, int _index) {
+                ChatMessage _message = _pageProvider.messages![_index];
+                bool _isOwnMessage = _message.senderID == _auth.user.uid;
+                return Container(
+                  child: CustomChatListViewTile(
+                    deviceHeight: _deviceHeight,
+                    width: _deviceHeight * 0.80,
+                    message: _message,
+                    isOwnMessage: _isOwnMessage,
+                    sender: widget.chat.members
+                        .where((_m) => _m.uid == _message.senderID)
+                        .first,
+                  ),
+                );
+              }),
+        );
+      } else {
+        return const Align(
+          alignment: Alignment.center,
+          child: Text(
+            "Be the first one to say hello!",
+            style: TextStyle(color: Colors.white),
+          ),
+        );
+      }
+    } else {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: Colors.white,
+        ),
+      );
+    }
+  }
+
+  Widget _sendMessageForm() {
+    return Container(
+      height: _deviceHeight * 0.06,
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(30, 29, 37, 1.0),
+        borderRadius: BorderRadius.circular(100),
+      ),
+      margin: EdgeInsets.symmetric(
+        horizontal: _deviceWidth * 0.04,
+        vertical: _deviceHeight * 0.03,
+      ),
+      child: Form(
+        key: _messageFormState,
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _messageTextField(),
+            _sendMessageButton(),
+            _imageMessageButton(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _messageTextField() {
+    return SizedBox(
+      width: _deviceWidth * 0.65,
+      child: CustomTextFormField(
+          onSaved: (_value) {
+            _pageProvider.message = _value;
+          },
+          regEx: r"^(?!\s*$).+",
+          hintText: "Type a message",
+          obscureText: false),
+    );
+  }
+
+  Widget _sendMessageButton() {
+    double _size = _deviceHeight * 0.04;
+    return Container(
+      height: _size,
+      width: _size,
+      child: IconButton(
+        icon: Icon(
+          Icons.send,
+          color: Colors.white,
+        ),
+        onPressed: () {
+          if (_messageFormState.currentState!.validate()) {
+            _messageFormState.currentState!.save();
+            _pageProvider.sendTextMessage();
+            _messageFormState.currentState!.reset();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _imageMessageButton() {
+    double _size = _deviceHeight * 0.04;
+    return Container(
+      height: _size,
+      width: _size,
+      child: FloatingActionButton(
+        backgroundColor: Color.fromRGBO(
+          0,
+          82,
+          218,
+          1.0,
+        ),
+        onPressed: () {
+          _pageProvider.sendImageMessage();
+        },
+        child: Icon(Icons.camera_enhance),
+      ),
+    );
+  }
 }

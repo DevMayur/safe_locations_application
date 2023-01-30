@@ -62,7 +62,6 @@ class ChatsPageProvider extends ChangeNotifier {
             ChatMessage _message = ChatMessage.fromJSON(_messageData);
             _messages.add(_message);
           }
-
           //Return chat instance
           return Chat(
               uid: _d.id,
