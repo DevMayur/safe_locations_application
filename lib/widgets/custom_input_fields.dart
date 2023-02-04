@@ -85,3 +85,46 @@ class CustomTextField extends StatelessWidget {
   }
 
 }
+
+class CustomUpdateTextFormField extends StatelessWidget {
+  final Function(String) onSaved;
+  final String regEx;
+  final String text;
+  final String hintText;
+  final bool obscureText;
+
+  CustomUpdateTextFormField({
+    required this.onSaved,
+    required this.regEx,
+    required this.text,
+    required this.hintText,
+    required this.obscureText
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      initialValue: text,
+      onSaved: (_value) => {
+        onSaved(_value!)
+      },
+      cursorColor: Colors.white,
+      style: const TextStyle(color: Colors.white),
+      obscureText: obscureText,
+      // validator: (_value) {
+      //   return RegExp(regEx).hasMatch(_value!) ? null : 'Enter a valid value';
+      // },
+      decoration: InputDecoration(
+          fillColor: const Color.fromRGBO(30, 29, 37, 1.0),
+          filled: true,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+            borderSide: BorderSide.none,
+          ),
+          hintText: hintText,
+          hintStyle: const TextStyle(color: Colors.white54),
+      ),
+    );
+  }
+
+}

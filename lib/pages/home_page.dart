@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:safe_locations_application/pages/register_page.dart';
+import 'package:safe_locations_application/pages/update_profile_page.dart';
 import 'package:safe_locations_application/pages/users_page.dart';
 import 'chats_page.dart';
 
@@ -14,7 +16,8 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
   final List<Widget> _pages = [
     ChatsPage(),
-    UsersPage()
+    UsersPage(),
+    UpdateProfilePage(),
   ];
   @override
   Widget build(BuildContext context) {
@@ -39,7 +42,11 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
             label: 'Users',
             icon: Icon(Icons.supervised_user_circle_sharp),
-          )
+          ),
+          BottomNavigationBarItem(
+            label: 'Profile',
+            icon: Icon(Icons.person_2),
+          ),
         ],
       ),
     );

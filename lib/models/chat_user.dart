@@ -5,7 +5,7 @@ class ChatUser {
   final String phone;
   final String imageURL;
   late DateTime lastActive;
-  late int safeLocation;
+  final String safeLocation;
 
   ChatUser({
     required this.uid,
