@@ -138,7 +138,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       _pageProvider = _context.watch<ProfilePageProvider>();
       if ( _pageProvider.getUser() != null ) {
         _user = _pageProvider.getUser()!;
-        _safeLocation = _user.safeLocation;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Container(
@@ -175,13 +174,16 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   Widget _viewOwnLocation() {
-    return ColoredRoundedButton(color: _colors.button_color, name: 'view my location',
-        height: _deviceHeight * 0.065,
-        width: _deviceWidth * 0.8,
-        onPressed: () {
-          launchMapUrl(_user.safeLocation);
-        });
-
+    if ( _isUserAtSafeLocation ) {
+      return ColoredRoundedButton(color: _colors.button_color, name: 'view my location',
+          height: _deviceHeight * 0.065,
+          width: _deviceWidth * 0.8,
+          onPressed: () {
+            launchMapUrl(_user.safeLocation);
+          });
+    } else {
+      return Container();
+    }
   }
 
   Future<void> launchMapUrl(String address) async {
@@ -347,6 +349,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             _imageURL = _user.imageURL;
           }
           _navigation.removeAndNavigateToRoute('/home');
+          if (!_unsavedChanges) {
+            _safeLocation = _user.safeLocation;
+          }
       print('mayurkakade final location $_safeLocation');
           await _db.updateUser(
               _uid,
