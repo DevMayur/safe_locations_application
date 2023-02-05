@@ -28,7 +28,7 @@ class AuthenticationProvider extends ChangeNotifier {
           "phone": _auth.currentUser?.phoneNumber,
           "image": "dafault",
           "last_active": Timestamp.now(),
-          "safe_location": -2,
+          "safe_location": "-1,-1",
         });
         _databaseService.updateUserLastSeenTime(_user.uid);
         _databaseService.getUser(_user.uid).then(
@@ -37,14 +37,17 @@ class AuthenticationProvider extends ChangeNotifier {
                 .checkIfUserExist(_auth.currentUser!.uid)
                 .then((userExist) {
               if (!userExist) {
-                _navigationService.removeAndNavigateToRoute('/register');
+                print('user not exist');
+                _navigationService.removeAndNavigateToRoute('/login');
               } else {
+                print('user exist');
                 _navigationService.removeAndNavigateToRoute('/home');
               }
             });
           },
         );
       } else {
+        print('not logged in');
         _navigationService.removeAndNavigateToRoute('/login');
       }
     });

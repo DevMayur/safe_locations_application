@@ -134,4 +134,18 @@ class DatabaseService {
     }
   }
 
+  Future<void> updateUser(String _uid, String _name, String _imageURL, String _safeLocation) async {
+    try {
+      await _db.collection(USER_COLLECTION).doc(_uid).update({
+        "uid": _uid,
+        "name": _name,
+        "image": _imageURL,
+        "last_active": DateTime.now().toUtc(),
+        "safe_location": _safeLocation,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
 }

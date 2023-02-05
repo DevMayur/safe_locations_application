@@ -1,4 +1,5 @@
 //packages
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
@@ -22,6 +23,8 @@ import '../services/navigation_service.dart';
 //pages
 import '../pages/chat_page.dart';
 
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
+
 class ChatsPage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -36,6 +39,7 @@ class _ChatsPageState extends State<ChatsPage> {
   late AuthenticationProvider _auth;
   late ChatsPageProvider _pageProvider;
   late NavigationService _navigation;
+  late UserColors _colors;
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +47,7 @@ class _ChatsPageState extends State<ChatsPage> {
     _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
     _navigation = GetIt.instance.get<NavigationService>();
+    _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<ChatsPageProvider>(
@@ -70,9 +75,9 @@ class _ChatsPageState extends State<ChatsPage> {
               TopBar(
                 'Chats',
                 primaryAction: IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.logout,
-                    color: Color.fromRGBO(0, 82, 218, 1.0),
+                    color: _colors.button_color,
                   ),
                   onPressed: () {
                     _auth.logOut();
@@ -103,19 +108,19 @@ class _ChatsPageState extends State<ChatsPage> {
           }
           else
           {
-            return const Center(
+            return Center(
               child: Text(
                 "No Chats Found",
                 style: TextStyle(
-                  color: Colors.white,
+                  color: _colors.color_text,
                 ),
               ),
             );
           }
         } else {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
-              color: Colors.white,
+              color: _colors.color_input,
             ),
           );
         }

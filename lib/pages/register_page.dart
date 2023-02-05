@@ -121,13 +121,6 @@ class _RegisterPageState extends State<RegisterPage> {
 
             _safeLocations(),
 
-            RoundedButton(name: 'Add Safe Location',
-                height: _deviceHeight * 0.065,
-                width: _deviceWidth * 0.65,
-                onPressed: () {
-
-                }),
-
           ],
         ),
       ),

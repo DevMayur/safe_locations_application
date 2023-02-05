@@ -1,4 +1,5 @@
 //packages
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
@@ -10,6 +11,9 @@ import '../models/chat_message.dart';
 import '../models/chat_user.dart';
 import 'message_bubble.dart';
 
+import 'package:get_it/get_it.dart';
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
+
 class CustomListViewTile extends StatelessWidget {
   final double height;
   final String title;
@@ -18,6 +22,7 @@ class CustomListViewTile extends StatelessWidget {
   final bool isActive;
   final bool isSelected;
   final Function onTap;
+  late UserColors _colors;
 
   CustomListViewTile ({
     required this.height,
@@ -31,6 +36,7 @@ class CustomListViewTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _colors = GetIt.instance.get<UserColors>();
     return ListTile(
       trailing: isSelected ? Icon( Icons.check, color: Colors.white ) : null,
       onTap: () => onTap(),
@@ -43,7 +49,7 @@ class CustomListViewTile extends StatelessWidget {
       title: Text(
         title,
         style: TextStyle(
-          color: Colors.white,
+          color: _colors.color_text,
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),
@@ -51,7 +57,7 @@ class CustomListViewTile extends StatelessWidget {
       subtitle: Text(
         subtitle,
         style: TextStyle(
-          color: Colors.white54,
+          color: _colors.color_text,
           fontSize: 12,
           fontWeight: FontWeight.w400,
         ),
@@ -70,6 +76,7 @@ class CustomListViewTileWithActivity extends StatelessWidget
   final bool isActive;
   final bool isActivity;
   final Function onTap;
+  late UserColors _colors;
 
   CustomListViewTileWithActivity ({
     required this.height,
@@ -84,14 +91,15 @@ class CustomListViewTileWithActivity extends StatelessWidget
 
   @override
   Widget build(BuildContext context) {
+    _colors = GetIt.instance.get<UserColors>();
     return ListTile(
       onTap: () => onTap(),
       minVerticalPadding: height * 0.20,
       leading: RoundedImageNetworkWithStatusIndicator(key: UniqueKey(), imagePath: imagePath, size: height/2, isActive: isActive),
       title: Text(
         title,
-        style: const TextStyle(
-            color: Colors.white, fontSize: 18, fontWeight: FontWeight.w500),
+        style: TextStyle(
+            color: _colors.color_text, fontSize: 18, fontWeight: FontWeight.w500),
       ),
       subtitle: isActivity
           ? Row(
@@ -100,15 +108,15 @@ class CustomListViewTileWithActivity extends StatelessWidget
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 SpinKitThreeBounce(
-                  color: Colors.white54,
+                  color: _colors.color_text,
                   size: height * 0.10,
                 )
               ],
             )
           : Text(
               subtitle,
-              style: const TextStyle(
-                color: Colors.white24,
+              style: TextStyle(
+                color: _colors.color_text,
                 fontSize: 12,
                 fontWeight: FontWeight.w400,
               ),

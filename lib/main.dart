@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,6 +14,9 @@ import './pages/login_page.dart';
 //providers
 import './provider/authentication_provider.dart';
 
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
+import 'package:get_it/get_it.dart';
+
 void main() {
   runApp(SplashPage(
     key: UniqueKey(),
@@ -23,8 +27,10 @@ void main() {
 }
 
 class MainApp extends StatelessWidget {
+  late UserColors _colors;
   @override
   Widget build(BuildContext context) {
+    _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<AuthenticationProvider>(
@@ -35,10 +41,10 @@ class MainApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Safe Location',
         theme: ThemeData(
-          backgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
-          scaffoldBackgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
-          bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-            backgroundColor: Color.fromRGBO(30, 29, 37, 1.0),
+          backgroundColor: _colors.background_color,
+          scaffoldBackgroundColor: _colors.background_color,
+          bottomNavigationBarTheme: BottomNavigationBarThemeData(
+            backgroundColor: _colors.navigation_bar_background,
           ),
         ),
         home: const Scaffold(
