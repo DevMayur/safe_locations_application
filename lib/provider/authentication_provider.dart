@@ -37,14 +37,17 @@ class AuthenticationProvider extends ChangeNotifier {
                 .checkIfUserExist(_auth.currentUser!.uid)
                 .then((userExist) {
               if (!userExist) {
-                _navigationService.removeAndNavigateToRoute('/register');
+                print('user not exist');
+                _navigationService.removeAndNavigateToRoute('/login');
               } else {
+                print('user exist');
                 _navigationService.removeAndNavigateToRoute('/home');
               }
             });
           },
         );
       } else {
+        print('not logged in');
         _navigationService.removeAndNavigateToRoute('/login');
       }
     });

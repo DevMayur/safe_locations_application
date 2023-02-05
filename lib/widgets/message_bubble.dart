@@ -6,11 +6,16 @@ import 'package:timeago/timeago.dart' as timeago;
 //models
 import '../models/chat_message.dart';
 
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
+import 'package:get_it/get_it.dart';
+
+
 class TextMessageBubble extends StatelessWidget {
   final bool isOwnMessage;
   final ChatMessage message;
   final double height;
   final double width;
+  late UserColors _colors;
 
   TextMessageBubble({
     required this.isOwnMessage,
@@ -21,14 +26,15 @@ class TextMessageBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _colors = GetIt.instance.get<UserColors>();
     List<Color> _colorScheme = isOwnMessage
         ? [
-            const Color.fromRGBO(0, 136, 249, 1.0),
-            const Color.fromRGBO(0, 82, 218, 1.0),
+            _colors.message_background,
+            _colors.message_background
           ]
         : [
-            const Color.fromRGBO(51, 49, 68, 1.0),
-            const Color.fromRGBO(51, 49, 68, 1.0),
+            _colors.message_background,
+            _colors.message_background
           ];
     return Container(
       height: height + (message.content.length / 20 * 6.0),

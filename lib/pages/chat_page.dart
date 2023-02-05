@@ -1,5 +1,6 @@
 //packages
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 
 //providers
 import 'package:provider/provider.dart';
@@ -17,6 +18,8 @@ import '../models/chat_message.dart';
 //providers
 import '../provider/chats_page_provider.dart';
 import '../provider/chat_page_provider.dart';
+
+import '../user_configurations/user_colors.dart';
 
 class ChatPage extends StatefulWidget {
 
@@ -39,6 +42,7 @@ class _ChatPageState extends State<ChatPage> {
 
   late GlobalKey<FormState> _messageFormState;
   late ScrollController _messagesListViewController;
+  late UserColors _colors;
 
   @override
   void initState() {
@@ -52,6 +56,7 @@ class _ChatPageState extends State<ChatPage> {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
+    _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
         providers: [
       ChangeNotifierProvider<ChatPageProvider>(
@@ -87,13 +92,15 @@ class _ChatPageState extends State<ChatPage> {
                   widget.chat.title(),
                   fontSize: 12,
                   primaryAction: IconButton(
-                    icon: const Icon(Icons.delete, color: Color.fromRGBO(0, 82, 218, 1.0),),
+                    icon: Icon(Icons.delete,
+                      color: _colors.button_color,
+                    ),
                     onPressed: () {
                       _pageProvider.deleteChat();
                     },
                   ),
                   secondaryAction: IconButton(
-                    icon: const Icon(Icons.arrow_back, color: Color.fromRGBO(0, 82, 218, 1.0),),
+                    icon: Icon(Icons.arrow_back, color: _colors.button_color,),
                     onPressed: () {
                       _pageProvider.goBack();
                     },
@@ -134,18 +141,18 @@ class _ChatPageState extends State<ChatPage> {
               }),
         );
       } else {
-        return const Align(
+        return Align(
           alignment: Alignment.center,
           child: Text(
             "Be the first one to say hello!",
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(color: _colors.color_text),
           ),
         );
       }
     } else {
-      return const Center(
+      return Center(
         child: CircularProgressIndicator(
-          color: Colors.white,
+          color: _colors.color_text,
         ),
       );
     }
@@ -155,7 +162,7 @@ class _ChatPageState extends State<ChatPage> {
     return Container(
       height: _deviceHeight * 0.06,
       decoration: BoxDecoration(
-        color: Color.fromRGBO(30, 29, 37, 1.0),
+        color: _colors.color_input,
         borderRadius: BorderRadius.circular(100),
       ),
       margin: EdgeInsets.symmetric(
@@ -196,11 +203,7 @@ class _ChatPageState extends State<ChatPage> {
     return Container(
       height: _size,
       width: _size,
-      child: IconButton(
-        icon: Icon(
-          Icons.send,
-          color: Colors.white,
-        ),
+      child: FloatingActionButton(
         onPressed: () {
           if (_messageFormState.currentState!.validate()) {
             _messageFormState.currentState!.save();
@@ -208,6 +211,7 @@ class _ChatPageState extends State<ChatPage> {
             _messageFormState.currentState!.reset();
           }
         },
+        child: Icon(Icons.send),
       ),
     );
   }
@@ -218,12 +222,6 @@ class _ChatPageState extends State<ChatPage> {
       height: _size,
       width: _size,
       child: FloatingActionButton(
-        backgroundColor: Color.fromRGBO(
-          0,
-          82,
-          218,
-          1.0,
-        ),
         onPressed: () {
           _pageProvider.sendImageMessage();
         },

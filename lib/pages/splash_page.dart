@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
 
 //pages
 import '../services/navigation_service.dart';
@@ -80,6 +81,23 @@ class _SplashPageState extends State<SplashPage> {
 
     GetIt.instance.registerSingleton<DatabaseService>(
       DatabaseService(),
+    );
+
+    UserColors userColors = UserColors(
+        background_color: Color.fromRGBO(218, 218, 218, 1.0),
+        color_primary: Color.fromRGBO(92, 140, 217, 1.0),
+        color_text: Colors.black,
+        color_input: Colors.white,
+        button_color: Color.fromRGBO(0, 82, 218, 1.0),
+        button_safe: Color.fromRGBO(0, 82, 218, 1.0),
+        button_unsafe: Color.fromRGBO(0, 82, 218, 1.0),
+        message_background:Colors.lightGreen ,
+      navigation_bar_icons:Color.fromRGBO(0, 82, 218, 1.0),
+      navigation_bar_background:Color.fromRGBO(161, 161, 161, 1.0),
+    );
+
+    GetIt.instance.registerSingleton<UserColors>(
+        userColors
     );
   }
 }
