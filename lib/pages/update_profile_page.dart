@@ -1,4 +1,7 @@
 //packages
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
@@ -21,6 +24,9 @@ import '../widgets/rounded_button.dart';
 //providers
 import '../provider/authentication_provider.dart';
 
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 class UpdateProfilePage extends StatefulWidget {
   @override
   State<StatefulWidget> createState() {
@@ -38,9 +44,12 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   late NavigationService _navigation;
   late ProfilePageProvider _pageProvider;
 
+  bool _isUserAtSafeLocation = false;
+  bool _unsavedChanges = false;
+  late UserColors _colors;
 
   String? _name;
-  String? _safeLocation = "[0,0]";
+  String? _safeLocation = "0,0";
   late ChatUser _user;
 
   PlatformFile? _profileImage;
@@ -115,6 +124,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     _db = GetIt.instance.get<DatabaseService>();
     _navigation = GetIt.instance.get<NavigationService>();
     _cloudStorageService = GetIt.instance.get<CloudStorageService>();
+    _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
         providers: [
           ChangeNotifierProvider<ProfilePageProvider>(create: (_) => ProfilePageProvider(_auth)),
@@ -128,6 +138,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       _pageProvider = _context.watch<ProfilePageProvider>();
       if ( _pageProvider.getUser() != null ) {
         _user = _pageProvider.getUser()!;
+        _safeLocation = _user.safeLocation;
         return Scaffold(
           resizeToAvoidBottomInset: false,
           body: Container(
@@ -143,6 +154,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
               children: [
                 _profileImageField(),
                 _registerForm(),
+                _viewOwnLocation(),
+                SizedBox(
+                  height: _deviceHeight * 0.05  ,
+                ),
                 _updateProfileButton(),
               ],
             ),
@@ -159,6 +174,44 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   }
 
+  Widget _viewOwnLocation() {
+    return ColoredRoundedButton(color: _colors.button_color, name: 'view my location',
+        height: _deviceHeight * 0.065,
+        width: _deviceWidth * 0.8,
+        onPressed: () {
+          launchMapUrl(_user.safeLocation);
+        });
+
+  }
+
+  Future<void> launchMapUrl(String address) async {
+    String encodedAddress = Uri.encodeComponent(address);
+    String googleMapUrl = "https://www.google.com/maps/search/?api=1&query=$encodedAddress";
+    String appleMapUrl = "http://maps.apple.com/?q=$encodedAddress";
+    if (Platform.isAndroid) {
+      try {
+        if (await canLaunch(googleMapUrl)) {
+          await launch(googleMapUrl);
+        } else {
+          throw 'Could not launch $googleMapUrl';
+        }
+      } catch (error) {
+        throw("Cannot launch Google map");
+      }
+    }
+    if (Platform.isIOS) {
+      try {
+        if (await canLaunch(appleMapUrl)) {
+          await launch(appleMapUrl);
+        } else {
+          throw 'Could not launch $appleMapUrl';
+        }
+      } catch (error) {
+        throw("Cannot launch Apple map");
+      }
+    }
+  }
+
   Widget _profileImageField() {
     return GestureDetector(
       onTap: () {
@@ -167,6 +220,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             _profileImage = _file;
           });
         });
+        _unsavedChanges = true;
       },
       child: () {
         if (_profileImage != null) {
@@ -187,6 +241,16 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   Widget _registerForm() {
+    String a = _user.safeLocation;
+    debugPrint('mayurkakade_user server $a');
+    String? longitude = a.split(',')[0];
+    String? lattitude = a.split(',')[1];
+    if (double.parse(longitude!) > 0 && double.parse(lattitude!) > 0) {
+      _isUserAtSafeLocation = true;
+    } else {
+      _isUserAtSafeLocation = false;
+    }
+
     return Container(
       height: _deviceHeight * 0.35,
       child: Form(
@@ -212,16 +276,29 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
             _safeLocations(),
 
+            SizedBox(
+              height: _deviceHeight * 0.05  ,
+            ),
+
             ColoredRoundedButton(
-                color: Colors.green,
-                name: 'Set Myself at safe location',
+                color: _isUserAtSafeLocation ? _colors.button_safe : _colors.button_unsafe,
+                name: _isUserAtSafeLocation ? 'Set Myself unsafe' : 'Set Myself safe',
                 height: _deviceHeight * 0.065,
                 width: _deviceWidth * 0.8,
                 onPressed: () async {
-                  await _getCurrentLocation();
-                  _safeLocation = _currentPosition != null
-                      ? "${_currentPosition.latitude},${_currentPosition.longitude}"
-                      : "-1,-1";
+                  _unsavedChanges = true;
+                  if ( !_isUserAtSafeLocation ) {
+                    await _getCurrentLocation();
+                    if (_currentPosition != null ) {
+                      _safeLocation = "${_currentPosition.latitude},${_currentPosition.longitude}";
+                    } else {
+                      _safeLocation = "0,0";
+                    }
+                  } else {
+                    _safeLocation = "0,0";
+                  }
+                  print('after set location $_safeLocation');
+                  setState(() {});
                 }),
           ],
         ),
@@ -230,11 +307,31 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   Widget _safeLocations() {
-    return Container();
+    return Container(
+      child: Text(
+        _isUserAtSafeLocation ? 'User is at safe location' : 'User is not at safe location',
+        style: TextStyle(
+          color: _colors.color_text,
+          fontSize: 24,
+        ),
+      ),
+    );
   }
 
+  Widget _viewLocation() {
+    return RoundedButton(
+        name: 'View users current safe location',
+        height: _deviceHeight * 0.065,
+        width: _deviceWidth * 0.65,
+        onPressed: () async {
+
+          setState(() {});
+        });
+  }
+
+
   Widget _updateProfileButton() {
-    return RoundedButton(name: 'Update Profile',
+    return RoundedButton(name: 'Update Profile ${_unsavedChanges ? '(unsaved)' : ''}',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.8,
         onPressed: () async {
@@ -250,6 +347,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             _imageURL = _user.imageURL;
           }
           _navigation.removeAndNavigateToRoute('/home');
+      print('mayurkakade final location $_safeLocation');
           await _db.updateUser(
               _uid,
               _name!,

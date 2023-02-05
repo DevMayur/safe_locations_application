@@ -29,7 +29,6 @@ class ProfilePageProvider extends ChangeNotifier {
   ChatUser? _user;
 
   ChatUser? getUser() {
-    debugPrint("Mayur user requested");
     return _user != null ? _user : null;
   }
 
