@@ -19,7 +19,7 @@ class ChatUser {
   factory ChatUser.fromJSON(Map<String, dynamic> _json) {
     return ChatUser(
         uid: _json["uid"],
-        name: _json["name"],
+        name: _json["phone"],
         phone: _json["phone"],
         imageURL: _json["image"],
         lastActive: _json["last_active"].toDate(),
@@ -45,7 +45,7 @@ class ChatUser {
   }
 
   bool isAtSafeLocation() {
-    return ( double.parse(safeLocation.split(",")[0]) > 0 && double.parse(safeLocation.split(",")[1]) > 0 );
+    return ( (safeLocation.split(",")[0]) != '0' && (safeLocation.split(",")[1]) != '0' );
   }
 
 }

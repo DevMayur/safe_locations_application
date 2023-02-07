@@ -247,7 +247,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     debugPrint('mayurkakade_user server $a');
     String? longitude = a.split(',')[0];
     String? lattitude = a.split(',')[1];
-    if (double.parse(longitude!) > 0 && double.parse(lattitude!) > 0) {
+    if (double.parse(longitude!) != 0 && double.parse(lattitude!) != 0) {
       _isUserAtSafeLocation = true;
     } else {
       _isUserAtSafeLocation = false;

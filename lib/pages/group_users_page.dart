@@ -112,13 +112,13 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
             return ListView.builder(
                 itemCount: _users.length,
                 itemBuilder: (BuildContext _context, int _index) {
-                  return CustomListViewTile(
+                  return CustomListViewTileWithSafetyStatus(
                       height: _deviceHeight * 0.10,
                       title: _users[_index].name,
                       subtitle: "Last Active: ${_users[_index].lastDayActive()}",
                       imagePath: _users[_index].imageURL,
                       isActive: _users[_index].isAtSafeLocation(),
-                      isSelected: _pageProvider.selectedUsers.contains(_users[_index]),
+                      isActivity: false,
                       onTap: () {
                         _pageProvider.updateSelectedUsers(_users[_index]);
                       });

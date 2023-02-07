@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:safe_locations_application/models/chat_message.dart';
 
@@ -32,22 +33,6 @@ class DatabaseService {
     return _query.get();
   }
 
-  // Future<QuerySnapshot> getGroupUsers( {required String chatId} ) {
-  //   debugPrint("Mayur Getting Users from $USER_COLLECTION");
-  //
-  //   // Query _query = _db.collection( CHAT_COLLECTION ).doc(chatId).
-  //
-  //
-  //   Query _query = _db.collection( USER_COLLECTION );
-  //   if ( name != null )
-  //   {
-  //     _query = _query
-  //         .where("name", isGreaterThanOrEqualTo: name)
-  //         .where("name", isLessThanOrEqualTo: name + "z");
-  //   }
-  //   debugPrint("Mayur Returned QuerySnapshot");
-  //   return _query.get();
-  // }
 
   Stream<QuerySnapshot> getChatsForUser(String _uid) {
     return _db.collection(CHAT_COLLECTION).where('members', arrayContains: _uid).snapshots();

@@ -28,7 +28,7 @@ class Chat {
   String title() {
     return !group
         ? _recpients.first.name
-        : _recpients.map((_user) => _user.name).join(",");
+        : /*_recpients.map((_user) => _user.name).join(",")*/ 'Group';
   }
 
   String imageURL() {
