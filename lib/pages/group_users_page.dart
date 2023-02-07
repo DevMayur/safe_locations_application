@@ -27,6 +27,9 @@ import '../provider/chat_page_provider.dart';
 
 import '../user_configurations/user_colors.dart';
 
+import 'package:maps_launcher/maps_launcher.dart';
+
+
 class GroupUsersPage extends StatefulWidget {
 
   final Chat chat;
@@ -152,35 +155,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
 
 
   void _viewOwnLocation(ChatUser _user) {
-    launchMapUrl(_user.safeLocation);
-  }
-
-  Future<void> launchMapUrl(String address) async {
-    String encodedAddress = Uri.encodeComponent(address);
-    String googleMapUrl = "https://www.google.com/maps/search/?api=1&query=$encodedAddress";
-    String appleMapUrl = "http://maps.apple.com/?q=$encodedAddress";
-    if (Platform.isAndroid) {
-      try {
-        if (await canLaunch(googleMapUrl)) {
-          await launch(googleMapUrl);
-        } else {
-          throw 'Could not launch $googleMapUrl';
-        }
-      } catch (error) {
-        throw("Cannot launch Google map");
-      }
-    }
-    if (Platform.isIOS) {
-      try {
-        if (await canLaunch(appleMapUrl)) {
-          await launch(appleMapUrl);
-        } else {
-          throw 'Could not launch $appleMapUrl';
-        }
-      } catch (error) {
-        throw("Cannot launch Apple map");
-      }
-    }
+    MapsLauncher.launchCoordinates(double.parse(_user.safeLocation.split(',')[0]), double.parse(_user.safeLocation.split(',')[1]));
   }
 
 

@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/provider/update_profile_page_provider.dart';
@@ -101,13 +102,15 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
     debugPrint('location_mayur calling await Geolocator.getCurrentPosition()');
-    return await Geolocator.getCurrentPosition();
+    return await Geolocator.getCurrentPosition(forceAndroidLocationManager: false,
+        desiredAccuracy: LocationAccuracy.lowest);
   }
 
   _getCurrentLocation() async {
     try {
       final position = await _determinePosition();
       _currentPosition = position;
+      debugPrint("location_mayur $_currentPosition");
       setState(() {
 
       });
@@ -187,31 +190,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   Future<void> launchMapUrl(String address) async {
-    String encodedAddress = Uri.encodeComponent(address);
-    String googleMapUrl = "https://www.google.com/maps/search/?api=1&query=$encodedAddress";
-    String appleMapUrl = "http://maps.apple.com/?q=$encodedAddress";
-    if (Platform.isAndroid) {
-      try {
-        if (await canLaunch(googleMapUrl)) {
-          await launch(googleMapUrl);
-        } else {
-          throw 'Could not launch $googleMapUrl';
-        }
-      } catch (error) {
-        throw("Cannot launch Google map");
-      }
-    }
-    if (Platform.isIOS) {
-      try {
-        if (await canLaunch(appleMapUrl)) {
-          await launch(appleMapUrl);
-        } else {
-          throw 'Could not launch $appleMapUrl';
-        }
-      } catch (error) {
-        throw("Cannot launch Apple map");
-      }
-    }
+    MapsLauncher.launchCoordinates(double.parse(address.split(',')[0]), double.parse(address.split(',')[1]));
   }
 
   Widget _profileImageField() {
