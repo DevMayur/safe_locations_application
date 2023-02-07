@@ -103,7 +103,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     // continue accessing the position of the device.
     debugPrint('location_mayur calling await Geolocator.getCurrentPosition()');
     return await Geolocator.getCurrentPosition(forceAndroidLocationManager: false,
-        desiredAccuracy: LocationAccuracy.lowest);
+        desiredAccuracy: LocationAccuracy.lowest).catchError((err) {
+          debugPrint('locationERROR__ ${err.toString()}');
+        });
   }
 
   _getCurrentLocation() async {
