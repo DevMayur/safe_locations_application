@@ -83,6 +83,7 @@ class _ChatsPageState extends State<ChatsPage> {
                     _auth.logOut();
                   },
                 ),
+                onTap: () {},
               ),
               _chatsList(),
             ],

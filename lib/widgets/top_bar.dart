@@ -5,6 +5,7 @@ class TopBar extends StatelessWidget {
   Widget? primaryAction;
   Widget? secondaryAction;
   double? fontSize;
+  Function onTap;
 
   late double _deviceHeight;
   late double _deviceWidth;
@@ -13,6 +14,7 @@ class TopBar extends StatelessWidget {
     this.primaryAction,
     this.secondaryAction,
     this.fontSize = 35,
+    required this.onTap,
   });
 
   @override
@@ -40,11 +42,16 @@ class TopBar extends StatelessWidget {
   }
 
   Widget _titleBar() {
-    return Text(
-      _barTitle,
-      overflow: TextOverflow.ellipsis,
-      style: TextStyle(
-          color: Colors.white, fontSize: fontSize, fontWeight: FontWeight.w700),
+    return TextButton(
+      onPressed: () {
+        onTap();
+      },
+      child: Text(
+        _barTitle,
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+            color: Colors.white, fontSize: fontSize, fontWeight: FontWeight.w700),
+      ),
     );
   }
 }
