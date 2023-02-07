@@ -57,7 +57,7 @@ class AuthenticationProvider extends ChangeNotifier {
       {required Function onCodeSent}) async {
     try {
       await _auth.verifyPhoneNumber(
-        phoneNumber: "+91$_phone",
+        phoneNumber: _phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential).then((value) {
             print("You are logged in successfully");
@@ -86,9 +86,13 @@ class AuthenticationProvider extends ChangeNotifier {
       if (_auth.currentUser != null) {
         _databaseService.getUser(_auth.currentUser!.uid).then((_snapshot) {
           if (_snapshot != null && _snapshot.exists) {
-            print(_snapshot);
             onLoginCompleted(true);
-        }});
+          }
+          else
+          {
+            onLoginCompleted(false);
+          }
+        });
       } else {
         onLoginCompleted(false);
       }

@@ -13,6 +13,7 @@ import '../provider/authentication_provider.dart';
 //services
 import '../services/navigation_service.dart';
 import '../services/database_service.dart';
+import 'package:country_picker/country_picker.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -31,6 +32,7 @@ class _LoginPageState extends State<LoginPage> {
 
   String? _phone;
   String? _otp;
+  String? _countryCode;
 
   bool otpVisibility = false;
   String _verificationID = "";
@@ -61,6 +63,7 @@ class _LoginPageState extends State<LoginPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             _pageTitle(),
+            //_selectCountry(),
             _loginForm(),
             SizedBox(
               height: _deviceHeight * 0.05,
@@ -129,41 +132,51 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _loginButton() {
-    return RoundedButton(
-        name: !otpVisibility ? "Send Otp" : "Submit",
-        height: _deviceHeight * 0.065,
-        width: _deviceWidth * 0.65,
-        onPressed: () {
-          if (_loginFormKey.currentState!.validate()) {
-            _loginFormKey.currentState!.save();
-            setState(() {
-              if (!otpVisibility) {
-                _auth.loginUsingPhoneNumber(_phone!,
-                    onCodeSent: (String verificationId, int? resendToken) {
-                  _verificationID = verificationId;
-                  _resendToken = resendToken;
-                });
-                otpVisibility ? {otpVisibility = false} : {otpVisibility = true};
-              } else {
-                _auth.verifyOtp(_verificationID, _resendToken, _otp!,
-                  onLoginCompleted: (bool success) {
-                    if (success) {
-                      if (success)
-                      {
-                        _navigation.removeAndNavigateToRoute('/register');
-                      }
-                      else
-                      {
-                        _navigation.removeAndNavigateToRoute('/login');
-                      }
-                    } else {
-                      print("Login Failed");
-                    }
-                  });
+    if ( _countryCode == null ) {
+      return RoundedButton(name: 'Select Country', height: _deviceHeight * 0.065,
+          width: _deviceWidth * 0.65, onPressed: () {
+            _selectCountry();
+          });
+    }
+    else {
+      return RoundedButton(
+          name: !otpVisibility ? "Send Otp" : "Submit",
+          height: _deviceHeight * 0.065,
+          width: _deviceWidth * 0.65,
+          onPressed: () {
+            if (_loginFormKey.currentState!.validate()) {
+              _loginFormKey.currentState!.save();
+              setState(() {
+                if (!otpVisibility) {
+                  debugPrint('${_countryCode}${_phone!}');
+                  _auth.loginUsingPhoneNumber('${_countryCode}${_phone!}',
+                      onCodeSent: (String verificationId, int? resendToken) {
+                        _verificationID = verificationId;
+                        _resendToken = resendToken;
+                      });
+                  otpVisibility ? {otpVisibility = false} : {
+                    otpVisibility = true
+                  };
+                } else {
+                  _auth.verifyOtp(_verificationID, _resendToken, _otp!,
+                      onLoginCompleted: (bool success) {
+                        if (success) {
+                          debugPrint('mlogin login successful');
+                          _navigation.removeAndNavigateToRoute('/home');
+                        } else {
+                          if (_auth.user != null) {
+                            _navigation.removeAndNavigateToRoute('/register');
+                            debugPrint("mlogin user registration");
+                          } else {
+                            debugPrint('mlogin Login Failed');
+                          }
+                        }
+                      });
                 }
-            });
-          }
-        });
+              });
+            }
+          });
+    }
   }
 
   Widget _registerAccountLink() {
@@ -176,6 +189,40 @@ class _LoginPageState extends State<LoginPage> {
           style: TextStyle(color: Colors.blueAccent),
         ),
       ),
+    );
+  }
+
+  _selectCountry() {
+    showCountryPicker(
+      showPhoneCode: true,
+      context: context,
+      countryListTheme: CountryListThemeData(
+        flagSize: 25,
+        backgroundColor: Colors.white,
+        textStyle: TextStyle(fontSize: 16, color: Colors.blueGrey),
+        bottomSheetHeight: 500, // Optional. Country list modal height
+        //Optional. Sets the border radius for the bottomsheet.
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20.0),
+          topRight: Radius.circular(20.0),
+        ),
+        //Optional. Styles the search field.
+        inputDecoration: InputDecoration(
+          labelText: 'Search',
+          hintText: 'Start typing to search',
+          prefixIcon: const Icon(Icons.search),
+          border: OutlineInputBorder(
+            borderSide: BorderSide(
+              color: const Color(0xFF8C98A8).withOpacity(0.2),
+            ),
+          ),
+        ),
+      ),
+      onSelect: (Country country) {
+        setState(() {
+          _countryCode = '+${country.phoneCode}';
+        });
+      },
     );
   }
 }

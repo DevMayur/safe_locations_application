@@ -1,14 +1,18 @@
 //packages
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 
 //providers
 import 'package:provider/provider.dart';
 import 'package:safe_locations_application/provider/users_page_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 //widgets
 import '../models/chat_user.dart';
 import '../provider/authentication_provider.dart';
+import '../widgets/rounded_button.dart';
 import '../widgets/top_bar.dart';
 import '../widgets/custom_list_view_tiles.dart';
 import '../widgets/custom_input_fields.dart';
@@ -120,7 +124,9 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
                       isActive: _users[_index].isAtSafeLocation(),
                       isActivity: false,
                       onTap: () {
-                        _pageProvider.updateSelectedUsers(_users[_index]);
+                        if ( _users[_index].isAtSafeLocation() ) {
+                          _viewOwnLocation(_users[_index]);
+                        }
                       });
                 });
           } else {
@@ -143,5 +149,39 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
       }(),
     );
   }
+
+
+  void _viewOwnLocation(ChatUser _user) {
+    launchMapUrl(_user.safeLocation);
+  }
+
+  Future<void> launchMapUrl(String address) async {
+    String encodedAddress = Uri.encodeComponent(address);
+    String googleMapUrl = "https://www.google.com/maps/search/?api=1&query=$encodedAddress";
+    String appleMapUrl = "http://maps.apple.com/?q=$encodedAddress";
+    if (Platform.isAndroid) {
+      try {
+        if (await canLaunch(googleMapUrl)) {
+          await launch(googleMapUrl);
+        } else {
+          throw 'Could not launch $googleMapUrl';
+        }
+      } catch (error) {
+        throw("Cannot launch Google map");
+      }
+    }
+    if (Platform.isIOS) {
+      try {
+        if (await canLaunch(appleMapUrl)) {
+          await launch(appleMapUrl);
+        } else {
+          throw 'Could not launch $appleMapUrl';
+        }
+      } catch (error) {
+        throw("Cannot launch Apple map");
+      }
+    }
+  }
+
 
 }

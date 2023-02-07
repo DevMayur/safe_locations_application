@@ -19,7 +19,7 @@ class ChatUser {
   factory ChatUser.fromJSON(Map<String, dynamic> _json) {
     return ChatUser(
         uid: _json["uid"],
-        name: _json["phone"],
+        name: _json["name"],
         phone: _json["phone"],
         imageURL: _json["image"],
         lastActive: _json["last_active"].toDate(),

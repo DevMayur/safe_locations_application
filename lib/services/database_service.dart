@@ -129,7 +129,7 @@ class DatabaseService {
         "phone": _phone,
         "image": _imageURL,
         "last_active": DateTime.now().toUtc(),
-        "safe_location": -2,
+        "safe_location": '0,0',
       });
     } catch(e) {
       print(e);

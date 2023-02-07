@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
+import 'package:safe_locations_application/services/navigation_service.dart';
 import 'package:safe_locations_application/widgets/rounded_image.dart';
 
 //services
@@ -31,6 +32,7 @@ class _RegisterPageState extends State<RegisterPage> {
   late AuthenticationProvider _auth;
   late DatabaseService _db;
   late CloudStorageService _cloudStorageService;
+  late NavigationService _navigationService;
 
   String? _name;
 
@@ -45,6 +47,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _auth = Provider.of<AuthenticationProvider>(context);
     _db = GetIt.instance.get<DatabaseService>();
     _cloudStorageService = GetIt.instance.get<CloudStorageService>();
+    _navigationService = GetIt.instance.get<NavigationService>();
     return buildUI();
   }
 
@@ -141,6 +144,7 @@ class _RegisterPageState extends State<RegisterPage> {
           String? _imageURL = await _cloudStorageService.saveUserImageToStorage(_uid!, _profileImage!);
           await _db.createUser(_uid, _name!, _imageURL!, _auth.user.phone);
           setState(() {});
+          _navigationService.navigateToRoute('/home');
         });
   }
 }
