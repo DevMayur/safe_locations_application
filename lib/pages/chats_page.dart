@@ -130,7 +130,7 @@ class _ChatsPageState extends State<ChatsPage> {
 
   Widget _chatTile(Chat _chat) {
     List<ChatUser> _recepients =_chat.recepients();
-    bool _isActive = _recepients.any((_d) => _d.wasRecentlyActive());
+    bool _isActive = _recepients.any((_d) => _d.isAtSafeLocation());
     String _subtitleText = "";
     if (_chat.messages.isNotEmpty) {
       _subtitleText = _chat.messages.first.type != MessageType.TEXT ? "Media Attachment" : _chat.messages.first.content;

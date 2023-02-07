@@ -44,4 +44,8 @@ class ChatUser {
     return DateTime.now().difference(lastActive).inHours < 2;
   }
 
+  bool isAtSafeLocation() {
+    return ( double.parse(safeLocation.split(",")[0]) > 0 && double.parse(safeLocation.split(",")[1]) > 0 );
+  }
+
 }

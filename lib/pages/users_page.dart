@@ -102,7 +102,7 @@ class _UsersPageState extends State<UsersPage> {
                       title: _users[_index].name,
                       subtitle: "Last Active: ${_users[_index].lastDayActive()}",
                       imagePath: _users[_index].imageURL,
-                      isActive: _users[_index].wasRecentlyActive(),
+                      isActive: _users[_index].isAtSafeLocation(),
                       isSelected: _pageProvider.selectedUsers.contains(_users[_index]),
                       onTap: () {
                         _pageProvider.updateSelectedUsers(_users[_index]);
