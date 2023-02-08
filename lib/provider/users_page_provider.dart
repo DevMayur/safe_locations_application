@@ -186,4 +186,8 @@ class UsersPageProvider extends ChangeNotifier {
     }
   }
 
+  void goBack() {
+    _navigation.goBack();
+  }
+
 }

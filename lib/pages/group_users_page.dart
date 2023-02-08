@@ -95,7 +95,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
                   secondaryAction: IconButton(
                     icon: Icon(Icons.arrow_back, color: _colors.button_color,),
                     onPressed: () {
-
+                      _pageProvider.goBack();
                     },
                   ),
                   onTap: () {},
