@@ -52,6 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget buildUI() {
+    debugPrint('mayurkakade__ on register page');
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: Container(

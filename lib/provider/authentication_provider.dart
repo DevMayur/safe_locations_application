@@ -22,6 +22,7 @@ class AuthenticationProvider extends ChangeNotifier {
     _databaseService = GetIt.instance.get<DatabaseService>();
     _auth.authStateChanges().listen((_user) {
       if (_user != null) {
+        debugPrint('mayurkakade__ $_user');
         user = ChatUser.fromJSON({
           "uid": _auth.currentUser?.uid,
           "name": "--",
@@ -31,6 +32,7 @@ class AuthenticationProvider extends ChangeNotifier {
           "safe_location": "-1,-1",
         });
         _databaseService.updateUserLastSeenTime(_user.uid);
+        debugPrint('mayurkakade__ ${_user.phoneNumber}');
         _databaseService.getUser(_user.uid).then(
           (_snapshot) {
             _databaseService
@@ -38,7 +40,7 @@ class AuthenticationProvider extends ChangeNotifier {
                 .then((userExist) {
               if (!userExist) {
                 print('user not exist');
-                _navigationService.removeAndNavigateToRoute('/login');
+                _navigationService.removeAndNavigateToRoute('/register');
               } else {
                 print('user exist');
                 _navigationService.removeAndNavigateToRoute('/home');

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 //services
 import '../services/database_service.dart';
@@ -49,8 +50,8 @@ class UsersPageProvider extends ChangeNotifier {
   }
 
   void getRegisteredContacts({String? name}) async {
+    await Permission.contacts.request();
     final List<Contact> _contacts = await FastContacts.allContacts;
-    // debugPrint("Mayur $name");
     _selectedUsers = [];
     try {
       _database.getUsers( name: name ).then((_snapshot) {
