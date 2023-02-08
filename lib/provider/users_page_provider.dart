@@ -157,8 +157,20 @@ class UsersPageProvider extends ChangeNotifier {
 
   bool contactContains( List<String> numberList, String number ) {
     for (String num in numberList) {
-      if( newString(number.replaceAll(' ', '').replaceAll('+', ' ').replaceAll('-', ''), 10)
-       == (newString(num.replaceAll('+', '').replaceAll(' ', '').replaceAll('-', ''), 10) ) ){
+      if( newString(number
+          .replaceAll(' ', '')
+          .replaceAll('+', ' ')
+          .replaceAll('-', '')
+          .replaceAll('(', '')
+          .replaceAll(')', ''), 10)
+       ==
+          ( newString(num
+              .replaceAll('+', '')
+              .replaceAll(' ', '')
+              .replaceAll('-', '')
+              .replaceAll('(', '')
+              .replaceAll(')', ''), 10) ) )
+      {
         return true;
       }
     }

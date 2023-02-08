@@ -42,7 +42,7 @@ dependencies:
     flutter_spinkit: "5.1.0"
     timeago: "3.1.0"
     flutter_keyboard_visibility: "5.0.3"
-    geolocator: ^9.0.2
+    location: ^4.2.0
     url_launcher: ^6.1.8
     maps_launcher: ^2.0.1
     fast_contacts: ^1.0.0

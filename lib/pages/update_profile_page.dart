@@ -11,7 +11,6 @@ import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/provider/update_profile_page_provider.dart';
 import 'package:safe_locations_application/services/navigation_service.dart';
 import 'package:safe_locations_application/widgets/rounded_image.dart';
-import 'package:geolocator/geolocator.dart';
 
 //services
 import '../services/media_service.dart';
@@ -27,6 +26,7 @@ import '../provider/authentication_provider.dart';
 
 import 'package:safe_locations_application/user_configurations/user_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:location/location.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   @override
@@ -56,7 +56,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   PlatformFile? _profileImage;
 
   final _registerFormKey = GlobalKey<FormState>();
-  late Position _currentPosition;
+  late LocationData _currentPosition;
 
   @override
   void initState() {
@@ -64,53 +64,41 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     _getCurrentLocation();
   }
 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+  Future<LocationData> _determinePosition() async {
+    Location location = new Location();
 
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      debugPrint('location_mayur Location services are disabled.');
-      return Future.error('Location services are disabled.');
-    }
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
 
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        debugPrint('location_mayur Location permissions are denied');
-        return Future.error('Location permissions are denied');
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return Future.error('Service not enabled');
       }
     }
 
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      debugPrint('location_mayur Location permissions are permanently denied, we cannot request permissions.');
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return Future.error('Location permission not granted');
+      }
     }
 
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    debugPrint('location_mayur calling await Geolocator.getCurrentPosition()');
-    return await Geolocator.getCurrentPosition(forceAndroidLocationManager: false,
-        desiredAccuracy: LocationAccuracy.lowest).catchError((err) {
-          debugPrint('locationERROR__ ${err.toString()}');
-        });
+    debugPrint('Getting location data');
+    _locationData = await location.getLocation();
+
+    return _locationData;
   }
 
   _getCurrentLocation() async {
     try {
-      final position = await _determinePosition();
+      final position = await _determinePosition().onError((error, stackTrace) {
+        debugPrint('Error determining location $error');
+        return Future.error(error.toString());
+      });
       _currentPosition = position;
       debugPrint("location_mayur $_currentPosition");
       setState(() {
