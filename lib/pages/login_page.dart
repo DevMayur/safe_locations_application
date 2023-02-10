@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_locations_application/services/database_service.dart';
+import 'package:safe_locations_application/user_configurations/user_strings.dart';
 
 //widgets
 import '../widgets/custom_input_fields.dart';
@@ -82,8 +83,8 @@ class _LoginPageState extends State<LoginPage> {
   Widget _pageTitle() {
     return Container(
       height: _deviceHeight * 0.10,
-      child: const Text(
-        'Safe Location',
+      child: Text(
+        UserStrings.appName(),
         style: TextStyle(
           color: Colors.white,
           fontSize: 40,

@@ -79,7 +79,6 @@ class _RegisterPageState extends State<RegisterPage> {
       onTap: () {
         GetIt.instance.get<MediaService>().pickImageFromLibrary().then((_file) {
           setState(() {
-
             _profileImage = _file;
           });
         });
@@ -110,7 +109,6 @@ class _RegisterPageState extends State<RegisterPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-
             CustomTextFormField(
                 onSaved: (_value) {
                   _name = _value;
@@ -118,13 +116,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 regEx: "",
                 hintText: 'Name',
                 obscureText: false),
-
             SizedBox(
-              height: _deviceHeight * 0.05  ,
+              height: _deviceHeight * 0.05,
             ),
-
             _safeLocations(),
-
           ],
         ),
       ),
@@ -136,13 +131,15 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _updateProfileButton() {
-    return RoundedButton(name: 'Update Profile',
+    return RoundedButton(
+        name: 'Update Profile',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
         onPressed: () async {
           _registerFormKey.currentState?.save();
           String? _uid = _auth.user.uid;
-          String? _imageURL = await _cloudStorageService.saveUserImageToStorage(_uid!, _profileImage!);
+          String? _imageURL = await _cloudStorageService.saveUserImageToStorage(
+              _uid!, _profileImage!);
           await _db.createUser(_uid, _name!, _imageURL!, _auth.user.phone);
           setState(() {});
           _navigationService.navigateToRoute('/home');
