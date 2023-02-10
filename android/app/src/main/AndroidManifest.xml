@@ -14,7 +14,7 @@
         tools:ignore="ScopedStorage" />
 
    <application
-        android:label="Arrivo"
+        android:label="Venit"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         <activity
