@@ -139,19 +139,29 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                 vertical: _deviceHeight * 0.02),
             height: _deviceHeight * 0.98,
             width: _deviceWidth * 0.97,
-            child: Column(
-              mainAxisSize: MainAxisSize.max,
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                _profileImageField(),
-                _registerForm(),
-                _viewOwnLocation(),
-                SizedBox(
-                  height: _deviceHeight * 0.05  ,
-                ),
-                _updateProfileButton(),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    height: _deviceHeight * 0.05  ,
+                  ),
+                  _profileImageField(),
+                  _registerForm(),
+
+                  SizedBox(
+                    height: _deviceHeight * 0.05  ,
+                  ),
+
+                  _viewOwnLocation(),
+                  SizedBox(
+                    height: _deviceHeight * 0.05  ,
+                  ),
+                  _updateProfileButton(),
+                ],
+              ),
             ),
           ),
         );
@@ -223,7 +233,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     }
 
     return Container(
-      height: _deviceHeight * 0.35,
       child: Form(
         key: _registerFormKey,
         child: Column(
@@ -246,6 +255,13 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             ),
 
             _safeLocations(),
+
+            //  Button to manage safe locations
+            SizedBox(
+              height: _deviceHeight * 0.05  ,
+            ),
+
+            _manageLocations(),
 
             SizedBox(
               height: _deviceHeight * 0.05  ,
@@ -279,22 +295,23 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   Widget _safeLocations() {
     return Container(
-      child: Text(
-        _isUserAtSafeLocation ? 'User is at safe location' : 'User is not at safe location',
-        style: TextStyle(
-          color: _colors.color_text,
-          fontSize: 24,
+      child:
+        Text(
+          _isUserAtSafeLocation ? 'User is at safe location' : 'User is not at safe location',
+          style: TextStyle(
+            color: _colors.color_text,
+            fontSize: 24,
+          ),
         ),
-      ),
     );
   }
 
-  Widget _viewLocation() {
+  Widget _manageLocations() {
     return RoundedButton(
-        name: 'View users current safe location',
+        name: 'Manage Safe Locations',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
-        onPressed: () async {
+        onPressed: () {
 
           setState(() {});
         });
