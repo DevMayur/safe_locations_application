@@ -58,6 +58,7 @@ class UsersPageProvider extends ChangeNotifier {
         registeredUsers = _snapshot.docs.map((_doc) {
           Map<String, dynamic> _data = _doc.data() as Map<String, dynamic>;
           _data["uid"] = _doc.id;
+          _data["safe_locations"] = _database.getLocations(_doc.id);
           return ChatUser.fromJSON(_data);
         }).toList();
 
@@ -99,6 +100,7 @@ class UsersPageProvider extends ChangeNotifier {
         users = _snapshot.docs.map((_doc) {
           Map<String, dynamic> _data = _doc.data() as Map<String, dynamic>;
           _data["uid"] = _doc.id;
+          _data["safe_locations"] = _database.getLocations(_doc.id);
           return ChatUser.fromJSON(_data);
         }).toList();
         notifyListeners();
@@ -134,6 +136,7 @@ class UsersPageProvider extends ChangeNotifier {
         DocumentSnapshot _userSnapshot = await _database.getUser(_uid);
         Map<String,dynamic> _userData = _userSnapshot.data() as Map<String, dynamic>;
         _userData["uid"] = _userSnapshot.id;
+        _userData["safe_locations"] = _database.getLocations(_userSnapshot.id);
         _members.add(ChatUser.fromJSON(_userData,),);
       }
       ChatPage _chatPage = ChatPage(chat:

@@ -5,9 +5,12 @@ import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:safe_locations_application/models/chat_message.dart';
 
+import '../models/safe_location.dart';
+
 const String USER_COLLECTION = "Users";
 const String CHAT_COLLECTION = "Chats";
 const String MESSAGES_COLLECTION = "messages";
+const String SAFE_LOCATIONS_COLLECTION = "safe_locations";
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -147,6 +150,39 @@ class DatabaseService {
       });
     } catch(e) {
       print(e);
+    }
+  }
+
+  void addIntoSafeLocations( String userId , String label, String location) async {
+    try {
+      await _db.collection(USER_COLLECTION).doc(userId).collection(SAFE_LOCATIONS_COLLECTION)
+          .add({
+            "label" : label,
+            "location" : location,
+          });
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  Future<QuerySnapshot> getSafeLocations({required String uid}) async {
+    Query _query = await _db.collection( USER_COLLECTION ).doc(uid).collection(SAFE_LOCATIONS_COLLECTION);
+    return _query.get();
+  }
+
+  Future<List<SafeLocation>?> getLocations(String uid) async {
+    List<SafeLocation> locations;
+    try {
+      await getSafeLocations( uid: uid ).then((_snapshot) {
+        locations = _snapshot.docs.map((_doc) {
+          Map<String, dynamic> _data = _doc.data() as Map<String, dynamic>;
+          _data["documentId"] = _doc.id;
+          return SafeLocation.fromJSON(_data);
+        }).toList();
+        return locations;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 

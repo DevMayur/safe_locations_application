@@ -1,4 +1,5 @@
 //packages
+import 'dart:async';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -11,6 +12,7 @@ import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/pages/manage_safe_locations_page.dart';
 import 'package:safe_locations_application/provider/update_profile_page_provider.dart';
 import 'package:safe_locations_application/services/navigation_service.dart';
+import 'package:safe_locations_application/widgets/custom_dialog.dart';
 import 'package:safe_locations_application/widgets/rounded_image.dart';
 
 //services
@@ -46,6 +48,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   late ProfilePageProvider _pageProvider;
 
   bool _isUserAtSafeLocation = false;
+  bool _backgroundLocationUpdatesEnabled = false;
   bool _unsavedChanges = false;
   late UserColors _colors;
 
@@ -57,6 +60,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   final _registerFormKey = GlobalKey<FormState>();
   late Position _currentPosition;
+  StreamSubscription<Position>? positionStream = null;
 
   @override
   void initState() {
@@ -98,7 +102,32 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
     // When we reach here, permissions are granted and we can
     // continue accessing the position of the device.
-    return await Geolocator.getCurrentPosition();
+    return getUserLocation();
+  }
+
+  Future<Position> getUserLocation() async {
+    late Position position;
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+            (Position? retrivedPosition) {
+              position = retrivedPosition!;
+              debugPrint('Stream gave position : ${retrivedPosition.accuracy}');
+              positionStream?.cancel();
+        });
+
+    try {
+      // Set a timeout of 5 seconds for getting the current position
+      position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).timeout(Duration(seconds: 5));
+    } on TimeoutException {
+      print('Timed out while getting location');
+    } catch (e) {
+      print('Error while getting location: $e');
+    }
+
+    return position;
   }
 
   _getCurrentLocation() async {
@@ -156,7 +185,15 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                   SizedBox(
                     height: _deviceHeight * 0.05  ,
                   ),
-                  _profileImageField(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisSize: MainAxisSize.max,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      _profileImageField(),
+                      _locationUpdatesSwitch(),
+                    ],
+                  ),
                   _registerForm(),
 
                   SizedBox(
@@ -199,6 +236,44 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   Future<void> launchMapUrl(String address) async {
     MapsLauncher.launchCoordinates(double.parse(address.split(',')[0]), double.parse(address.split(',')[1]));
+  }
+
+  Widget _locationUpdatesSwitch() {
+    return Row(
+      children: [
+        Text('Enable Live Location', style: TextStyle(
+          color: _colors.color_text,
+        ),),
+        Switch(
+          value: _backgroundLocationUpdatesEnabled, onChanged: (bool value) {
+          _backgroundLocationUpdatesEnabled = value;
+          setState(() {});
+          if ( _backgroundLocationUpdatesEnabled ) {
+            _startListeningToLiveLocationUpdates();
+          } else {
+            _stopListeningToLiveLocationUpdates();
+          }
+        },
+        ),
+      ],
+    );
+  }
+
+  void _startListeningToLiveLocationUpdates() async {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 100,
+    );
+    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+            (Position? position) {
+          _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+        });
+  }
+
+  void _stopListeningToLiveLocationUpdates() {
+    if (positionStream != null) {
+      positionStream!.cancel();
+    }
   }
 
   Widget _profileImageField() {
@@ -277,18 +352,26 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
             ColoredRoundedButton(
                 color: _isUserAtSafeLocation ? _colors.button_safe : _colors.button_unsafe,
-                name: _isUserAtSafeLocation ? 'Set Myself unsafe' : 'Set Myself safe',
+                name: _isUserAtSafeLocation ? 'Set Myself unsafe' : 'Add Safe Location',
                 height: _deviceHeight * 0.065,
                 width: _deviceWidth * 0.8,
                 onPressed: () async {
                   _unsavedChanges = true;
                   if ( !_isUserAtSafeLocation ) {
+                    debugPrint('locations 1 : ${_safeLocation}');
                     await _getCurrentLocation();
                     if (_currentPosition != null ) {
                       _safeLocation = "${_currentPosition.latitude},${_currentPosition.longitude}";
                     } else {
                       _safeLocation = "0,0";
                     }
+                    debugPrint('locations 2 : ${_safeLocation}');
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return CustomDialog(location: _safeLocation!);
+                      },
+                    );
                   } else {
                     _safeLocation = "0,0";
                   }
@@ -321,7 +404,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
         onPressed: () {
-          _navigation.navigateToPage(ManageSafeLocationsPage());
+          _navigation.navigateToPage(ManageSafeLocationsPage(
+              isUserAtSafeLocation: _isUserAtSafeLocation,
+              safeLocation: _safeLocation!
+          )
+          );
           setState(() {});
         });
   }

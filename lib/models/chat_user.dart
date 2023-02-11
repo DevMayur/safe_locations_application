@@ -1,3 +1,5 @@
+import 'package:safe_locations_application/models/safe_location.dart';
+
 class ChatUser {
 
   final String uid;
@@ -6,6 +8,7 @@ class ChatUser {
   final String imageURL;
   late DateTime lastActive;
   final String safeLocation;
+  List<SafeLocation> safeLocations;
 
   ChatUser({
     required this.uid,
@@ -14,6 +17,7 @@ class ChatUser {
     required this.imageURL,
     required this.lastActive,
     required this.safeLocation,
+    required this.safeLocations
   });
 
   factory ChatUser.fromJSON(Map<String, dynamic> _json) {
@@ -23,7 +27,8 @@ class ChatUser {
         phone: _json["phone"],
         imageURL: _json["image"],
         lastActive: _json["last_active"].toDate(),
-        safeLocation: _json["safe_location"]);
+        safeLocation: _json["safe_location"],
+        safeLocations: []);
   }
 
   Map<String, dynamic> toMap() {
@@ -45,6 +50,10 @@ class ChatUser {
   }
 
   bool isAtSafeLocation() {
+    //get locations list
+    for (SafeLocation location in safeLocations) {
+
+    }
     return ( (safeLocation.split(",")[0]) != '0' && (safeLocation.split(",")[1]) != '0' );
   }
 

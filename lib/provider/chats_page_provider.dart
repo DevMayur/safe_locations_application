@@ -51,6 +51,7 @@ class ChatsPageProvider extends ChangeNotifier {
               Map<String, dynamic> _userData =
               _userSnapshot.data() as Map<String, dynamic>;
               _userData["uid"] = _userSnapshot.id;
+              _userData["safe_locations"] = _db.getLocations(_userSnapshot.id);
               _members.add(ChatUser.fromJSON(_userData));
             }
           }

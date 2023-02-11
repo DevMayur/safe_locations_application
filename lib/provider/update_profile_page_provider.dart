@@ -54,6 +54,7 @@ class ProfilePageProvider extends ChangeNotifier {
           "image": _snapshot["image"],
           "last_active": Timestamp.now(),
           "safe_location": _snapshot["safe_location"],
+          "safe_locations": _database.getLocations(_snapshot["uid"]),
         });
         debugPrint("Mayur {update_profile_page_provider} snapshot user ${_user?.name}");
         notifyListeners();
