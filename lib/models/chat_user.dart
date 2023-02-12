@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:safe_locations_application/models/safe_location.dart';
 
 class ChatUser {
@@ -8,7 +9,8 @@ class ChatUser {
   final String imageURL;
   late DateTime lastActive;
   final String safeLocation;
-  List<SafeLocation> safeLocations;
+  final List<String> safeLocations;
+  final List<String> safeLocationsLabels;
 
   ChatUser({
     required this.uid,
@@ -17,19 +19,26 @@ class ChatUser {
     required this.imageURL,
     required this.lastActive,
     required this.safeLocation,
-    required this.safeLocations
+    required this.safeLocations,
+    required this.safeLocationsLabels
   });
 
   factory ChatUser.fromJSON(Map<String, dynamic> _json) {
+    debugPrint('MayurDebugger ${_json["safe_locations"]}');
     return ChatUser(
-        uid: _json["uid"],
-        name: _json["name"],
-        phone: _json["phone"],
-        imageURL: _json["image"],
-        lastActive: _json["last_active"].toDate(),
-        safeLocation: _json["safe_location"],
-        safeLocations: []);
+      uid: _json["uid"],
+      name: _json["name"],
+      phone: _json["phone"],
+      imageURL: _json["image"],
+      lastActive: _json["last_active"].toDate(),
+      safeLocation: _json["safe_location"],
+      safeLocations: _json["safe_locations"] != null ?
+      List<String>.from(_json["safe_locations"].map((location) => location.toString())) : [],
+      safeLocationsLabels: _json["location_labels"] != null ?
+      List<String>.from(_json["location_labels"].map((label) => label.toString())) : [],
+    );
   }
+
 
   Map<String, dynamic> toMap() {
     return {
@@ -38,6 +47,8 @@ class ChatUser {
       "last_active" : lastActive,
       "image" : imageURL,
       "safe_location" : safeLocation,
+      "safe_locations" : safeLocations,
+      "location_lables" : safeLocationsLabels,
     };
   }
 
@@ -51,7 +62,7 @@ class ChatUser {
 
   bool isAtSafeLocation() {
     //get locations list
-    for (SafeLocation location in safeLocations) {
+    for (String location in safeLocations) {
 
     }
     return ( (safeLocation.split(",")[0]) != '0' && (safeLocation.split(",")[1]) != '0' );

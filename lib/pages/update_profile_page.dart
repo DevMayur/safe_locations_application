@@ -365,11 +365,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                     } else {
                       _safeLocation = "0,0";
                     }
-                    debugPrint('locations 2 : ${_safeLocation}');
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return CustomDialog(location: _safeLocation!);
+                        return CustomDialog(location: _safeLocation!, safeLocations: _user.safeLocations, locationLabels: _user.safeLocationsLabels, profilePageProvider: _pageProvider,);
                       },
                     );
                   } else {

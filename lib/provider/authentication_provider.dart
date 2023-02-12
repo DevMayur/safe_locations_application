@@ -30,7 +30,8 @@ class AuthenticationProvider extends ChangeNotifier {
           "image": "dafault",
           "last_active": Timestamp.now(),
           "safe_location": "0,0",
-          "safe_locations": _databaseService.getLocations(_auth.currentUser!.uid),
+          "safe_locations": [],
+          "location_labels": [],
         });
         _databaseService.updateUserLastSeenTime(_user.uid);
         debugPrint('mayurkakade__ ${_user.phoneNumber}');

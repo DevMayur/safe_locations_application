@@ -126,6 +126,7 @@ class DatabaseService {
 
   Future<void> createUser(String _uid, String _name, String _imageURL, String _phone) async {
     try {
+      List<String> strArr = [];
       await _db.collection(USER_COLLECTION).doc(_uid).set({
         "uid": _uid,
         "name": _name,
@@ -133,6 +134,8 @@ class DatabaseService {
         "image": _imageURL,
         "last_active": DateTime.now().toUtc(),
         "safe_location": '0,0',
+        "safe_locations": strArr,
+        "location_labels": strArr,
       });
     } catch(e) {
       print(e);
@@ -153,13 +156,25 @@ class DatabaseService {
     }
   }
 
-  void addIntoSafeLocations( String userId , String label, String location) async {
+  Future<void> addIntoSafeLocations( String userId , String label, String location, List<String> safeLocations, List<String> safeLocationLabels) async {
     try {
-      await _db.collection(USER_COLLECTION).doc(userId).collection(SAFE_LOCATIONS_COLLECTION)
-          .add({
-            "label" : label,
-            "location" : location,
-          });
+      if (safeLocations.isNotEmpty) {
+        safeLocations.add(location);
+      } else {
+        safeLocations = [location];
+      }
+
+      if (safeLocationLabels.isNotEmpty) {
+        safeLocationLabels.add(label);
+      } else {
+        safeLocationLabels = [label];
+      }
+
+      await _db.collection(USER_COLLECTION).doc(userId)
+          .update({
+        "safe_locations" : safeLocations,
+        "location_labels" : safeLocationLabels,
+      });
     } catch(e) {
       print(e);
     }

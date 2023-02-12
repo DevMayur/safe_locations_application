@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 //providers
 import '../provider/authentication_provider.dart';
+import '../provider/update_profile_page_provider.dart';
 
 //services
 import '../services/navigation_service.dart';
@@ -11,23 +12,33 @@ import '../services/database_service.dart';
 
 class CustomDialog extends StatefulWidget {
   final String location;
+  final List<String> safeLocations;
+  final List<String> locationLabels;
+  final ProfilePageProvider profilePageProvider;
 
-  CustomDialog({required this.location});
+  CustomDialog({required this.location, required this.safeLocations, required this.locationLabels, required this.profilePageProvider});
 
   @override
   _CustomDialogState createState() => _CustomDialogState(
-      location: location
+      location: location,
+      safeLocations: safeLocations,
+      locationLabels: locationLabels,
+      profilePageProvider: profilePageProvider,
   );
 }
 
 class _CustomDialogState extends State<CustomDialog> {
   final _textController = TextEditingController();
   final String location;
+  final List<String> safeLocations;
+  final List<String> locationLabels;
   late AuthenticationProvider _auth;
   late NavigationService _navigation;
   late DatabaseService _database;
+  final ProfilePageProvider profilePageProvider;
 
-  _CustomDialogState({required this.location});
+
+  _CustomDialogState({required this.location, required this.safeLocations, required this.locationLabels, required this.profilePageProvider});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +61,8 @@ class _CustomDialogState extends State<CustomDialog> {
         OutlinedButton(
           child: Text('Submit'),
           onPressed: () async {
-            _storeSafeLocation( _textController.text );
+            await _storeSafeLocation( _textController.text );
+            profilePageProvider.updateSafeLocations();
             Navigator.pop(context);
           },
         ),
@@ -58,7 +70,7 @@ class _CustomDialogState extends State<CustomDialog> {
     );
   }
 
-  void _storeSafeLocation( String label ) async {
-    _database.addIntoSafeLocations( _auth.user.uid, label, location );
+  Future<void> _storeSafeLocation( String label ) async {
+    await _database.addIntoSafeLocations( _auth.user.uid, label, location, safeLocations, locationLabels );
   }
 }
