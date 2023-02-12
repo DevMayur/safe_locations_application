@@ -71,5 +71,9 @@ class ProfilePageProvider extends ChangeNotifier {
     _getUser();
   }
 
+  Future<void> updateCurrentLocation(String safeLocation, String uid) async {
+    await _database.updateSafeLocation(safeLocation, uid);
+  }
+
 
 }

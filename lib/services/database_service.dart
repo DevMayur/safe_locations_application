@@ -201,4 +201,14 @@ class DatabaseService {
     }
   }
 
+  Future<void> updateSafeLocation(String safeLocation, String uid) async {
+    try {
+      await _db.collection(USER_COLLECTION).doc(uid).update({
+        "safe_location": safeLocation,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
 }

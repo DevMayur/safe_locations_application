@@ -265,8 +265,9 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
       distanceFilter: 100,
     );
     positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-            (Position? position) {
+            (Position? position) async {
           _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+          await _pageProvider.updateCurrentLocation(_safeLocation!, _auth.user.uid);
         });
   }
 
@@ -402,7 +403,13 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         name: 'Manage Safe Locations',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
-        onPressed: () {
+        onPressed: () async {
+          await _getCurrentLocation();
+          if (_currentPosition != null ) {
+            _safeLocation = "${_currentPosition.latitude},${_currentPosition.longitude}";
+          } else {
+            _safeLocation = "0,0";
+          }
           _navigation.navigateToPage(ManageSafeLocationsPage(
               isUserAtSafeLocation: _isUserAtSafeLocation,
               safeLocation: _safeLocation!

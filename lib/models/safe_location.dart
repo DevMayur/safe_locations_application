@@ -2,7 +2,7 @@ class SafeLocation {
 
   final String label;
   final String location;
-  final String documentId;
+  final int documentId;
 
   SafeLocation({
     required this.label,

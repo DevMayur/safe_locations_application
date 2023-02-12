@@ -113,9 +113,9 @@ class ManageSafeLocationPageState extends State<ManageSafeLocationsPage> {
                   return CustomListViewTileWithSafetyStatus(
                       height: _deviceHeight * 0.10,
                       title: _safeLocations[_index].label,
-                      subtitle: isUserAtSafeLocation ? getDistance(safeLocation, _safeLocations[_index] ) : '-',
+                      subtitle: getDistanceString(safeLocation, _safeLocations[_index] ),
                       imagePath: 'https://img.icons8.com/nolan/96/user-location.png',
-                      isActive: false,
+                      isActive: getDistance(safeLocation, _safeLocations[_index]) > 100 ? false : true,
                       isActivity: false,
                       onTap: () {
                         // if (_safeLocations[_index].isAtSafeLocation()) {
@@ -144,9 +144,17 @@ class ManageSafeLocationPageState extends State<ManageSafeLocationsPage> {
     );
   }
 
+  getDistanceString(String safeLocation, SafeLocation safeLocation2) {
+    double distanceInMeters = Geolocator.distanceBetween(double.parse(safeLocation.split(',')[0]), double.parse(safeLocation.split(',')[1]), double.parse(safeLocation2.location.split(',')[0]), double.parse(safeLocation2.location.split(',')[1]));
+    debugPrint('safeLocation : ${safeLocation}');
+    debugPrint('safeLocation2 : ${safeLocation2.location}');
+    debugPrint('safeLocation2 : ${safeLocation2.label}');
+    return '${(distanceInMeters).toInt()} m away';
+  }
+
   getDistance(String safeLocation, SafeLocation safeLocation2) {
     double distanceInMeters = Geolocator.distanceBetween(double.parse(safeLocation.split(',')[0]), double.parse(safeLocation.split(',')[1]), double.parse(safeLocation2.location.split(',')[0]), double.parse(safeLocation2.location.split(',')[1]));
-    return '${(distanceInMeters).toInt() / 1000} km away';
+    return distanceInMeters;
   }
 
 }

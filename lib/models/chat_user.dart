@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:safe_locations_application/models/safe_location.dart';
 
 class ChatUser {
@@ -63,9 +64,16 @@ class ChatUser {
   bool isAtSafeLocation() {
     //get locations list
     for (String location in safeLocations) {
-
+      if (getDistance(location, safeLocation) < 100) {
+        return true;
+      }
     }
-    return ( (safeLocation.split(",")[0]) != '0' && (safeLocation.split(",")[1]) != '0' );
+    return false;
+  }
+
+  getDistance(String safeLocation, String safeLocation2) {
+    double distanceInMeters = Geolocator.distanceBetween(double.parse(safeLocation.split(',')[0]), double.parse(safeLocation.split(',')[1]), double.parse(safeLocation2.split(',')[0]), double.parse(safeLocation2.split(',')[1]));
+    return distanceInMeters;
   }
 
 }
