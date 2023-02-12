@@ -22,6 +22,10 @@ class DatabaseService {
     return _db.collection(USER_COLLECTION).doc(_uid).get();
   }
 
+  Future<Stream<DocumentSnapshot<Map<String, dynamic>>>> listenToUser( String _uid ) async {
+    return await _db.collection(USER_COLLECTION).doc(_uid).snapshots();
+  }
+
   Future<QuerySnapshot> getUsers( {String? name} )
   {
     debugPrint("Mayur Getting Users from $USER_COLLECTION");

@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 
 //providers
 import 'package:provider/provider.dart';
+import 'package:safe_locations_application/provider/group_users_provider.dart';
 import 'package:safe_locations_application/provider/users_page_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -47,7 +48,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
   late double _deviceWidth;
 
   late AuthenticationProvider _auth;
-  late UsersPageProvider _pageProvider;
+  late GroupUsersPageProvider _pageProvider;
 
   late ScrollController _messagesListViewController;
   late UserColors _colors;
@@ -66,7 +67,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
     _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<UsersPageProvider>(create: (_) => UsersPageProvider(_auth)),
+        ChangeNotifierProvider<GroupUsersPageProvider>(create: (_) => GroupUsersPageProvider(_auth, widget.chat.members)),
       ],
       child: _buildUI(),
     );
@@ -74,7 +75,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
 
   Widget _buildUI() {
     return Builder(builder: (BuildContext _context) {
-      _pageProvider = _context.watch<UsersPageProvider>();
+      _pageProvider = _context.watch<GroupUsersPageProvider>();
       return Scaffold(
         body: SingleChildScrollView(
           child: Container(
@@ -111,7 +112,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
   }
 
   Widget _usersList() {
-    List<ChatUser>? _users = widget.chat.members;
+    List<ChatUser>? _users = _pageProvider.getMembers();
     return Expanded(
       child: () {
         if(_users != null) {
