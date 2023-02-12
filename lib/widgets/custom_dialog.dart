@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 //providers
 import '../provider/authentication_provider.dart';
+import '../provider/safe_location_provider.dart';
 import '../provider/update_profile_page_provider.dart';
 
 //services
@@ -14,7 +15,7 @@ class CustomDialog extends StatefulWidget {
   final String location;
   final List<String> safeLocations;
   final List<String> locationLabels;
-  final ProfilePageProvider profilePageProvider;
+  final SafeLocationProvider profilePageProvider;
 
   CustomDialog({required this.location, required this.safeLocations, required this.locationLabels, required this.profilePageProvider});
 
@@ -35,7 +36,7 @@ class _CustomDialogState extends State<CustomDialog> {
   late AuthenticationProvider _auth;
   late NavigationService _navigation;
   late DatabaseService _database;
-  final ProfilePageProvider profilePageProvider;
+  final SafeLocationProvider profilePageProvider;
 
 
   _CustomDialogState({required this.location, required this.safeLocations, required this.locationLabels, required this.profilePageProvider});
@@ -62,8 +63,8 @@ class _CustomDialogState extends State<CustomDialog> {
           child: Text('Submit'),
           onPressed: () async {
             await _storeSafeLocation( _textController.text );
-            profilePageProvider.updateSafeLocations();
             Navigator.pop(context);
+            profilePageProvider.goBack();
           },
         ),
       ],

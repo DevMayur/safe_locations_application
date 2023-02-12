@@ -126,7 +126,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     } catch (e) {
       print('Error while getting location: $e');
     }
-
+    _currentPosition = position;
     return position;
   }
 
@@ -267,6 +267,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
             (Position? position) async {
           _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+          debugPrint('1safeLocations : ${_safeLocation}');
           await _pageProvider.updateCurrentLocation(_safeLocation!, _auth.user.uid);
         });
   }
@@ -307,10 +308,7 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
 
   Widget _registerForm() {
     String a = _user.safeLocation;
-    debugPrint('mayurkakade_user server $a');
-    String? longitude = a.split(',')[0];
-    String? lattitude = a.split(',')[1];
-    if (double.parse(longitude!) != 0 && double.parse(lattitude!) != 0) {
+    if (_user.isAtSafeLocation()) {
       _isUserAtSafeLocation = true;
     } else {
       _isUserAtSafeLocation = false;
@@ -350,34 +348,6 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
             SizedBox(
               height: _deviceHeight * 0.05  ,
             ),
-
-            ColoredRoundedButton(
-                color: _isUserAtSafeLocation ? _colors.button_safe : _colors.button_unsafe,
-                name: _isUserAtSafeLocation ? 'Set Myself unsafe' : 'Add Safe Location',
-                height: _deviceHeight * 0.065,
-                width: _deviceWidth * 0.8,
-                onPressed: () async {
-                  _unsavedChanges = true;
-                  if ( !_isUserAtSafeLocation ) {
-                    debugPrint('locations 1 : ${_safeLocation}');
-                    await _getCurrentLocation();
-                    if (_currentPosition != null ) {
-                      _safeLocation = "${_currentPosition.latitude},${_currentPosition.longitude}";
-                    } else {
-                      _safeLocation = "0,0";
-                    }
-                    showDialog(
-                      context: context,
-                      builder: (BuildContext context) {
-                        return CustomDialog(location: _safeLocation!, safeLocations: _user.safeLocations, locationLabels: _user.safeLocationsLabels, profilePageProvider: _pageProvider,);
-                      },
-                    );
-                  } else {
-                    _safeLocation = "0,0";
-                  }
-                  print('after set location $_safeLocation');
-                  setState(() {});
-                }),
           ],
         ),
       ),
@@ -403,16 +373,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         name: 'Manage Safe Locations',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
-        onPressed: () async {
-          await _getCurrentLocation();
-          if (_currentPosition != null ) {
-            _safeLocation = "${_currentPosition.latitude},${_currentPosition.longitude}";
-          } else {
-            _safeLocation = "0,0";
-          }
+        onPressed: () {
           _navigation.navigateToPage(ManageSafeLocationsPage(
               isUserAtSafeLocation: _isUserAtSafeLocation,
-              safeLocation: _safeLocation!
+              safeLocation: _user.safeLocation!
           )
           );
           setState(() {});

@@ -9,6 +9,7 @@ import '../provider/authentication_provider.dart';
 import '../services/database_service.dart';
 import '../services/navigation_service.dart';
 import '../user_configurations/user_colors.dart';
+import '../widgets/custom_dialog.dart';
 import '../widgets/custom_list_view_tiles.dart';
 import '../widgets/top_bar.dart';
 
@@ -75,6 +76,24 @@ class ManageSafeLocationPageState extends State<ManageSafeLocationsPage> {
 
   Widget _buildUI(_context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return CustomDialog(
+                location: safeLocation,
+                safeLocations: _pageProvider.locations.map((loc) => loc.location).toList(),
+                locationLabels: _pageProvider.locations.map((loc) => loc.label).toList(),
+                profilePageProvider: _pageProvider,
+              );
+            },
+          );
+        },
+        child: Icon(
+          Icons.add
+        ),
+      ),
       body: Builder(builder: (BuildContext _context) {
         _pageProvider = _context.watch<SafeLocationProvider>();
         return Container(
