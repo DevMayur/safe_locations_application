@@ -30,11 +30,14 @@ class GroupUsersPageProvider extends ChangeNotifier {
 
   List<ChatUser>? members;
 
+  Chat chat;
+  String groupName;
+
   List<ChatUser> getMembers() {
     return members!;
   }
 
-  GroupUsersPageProvider(this._auth, this.members) {
+  GroupUsersPageProvider(this._auth, this.members, this.groupName, this.chat) {
     _database = GetIt.instance.get<DatabaseService>();
     _navigation = GetIt.instance.get<NavigationService>();
     listenToUserChanges();
@@ -69,6 +72,14 @@ class GroupUsersPageProvider extends ChangeNotifier {
         }
       });
     }
+  }
+
+  void updateChatName() {
+    _database.updateGroupName(chat.uid, groupName);
+  }
+
+  void setGroupName({required String name}) {
+    groupName = name;
   }
 
 }
