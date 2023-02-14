@@ -11,6 +11,7 @@ import 'package:provider/provider.dart';
 import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/pages/manage_safe_locations_page.dart';
 import 'package:safe_locations_application/provider/update_profile_page_provider.dart';
+import 'package:safe_locations_application/services/location_service.dart';
 import 'package:safe_locations_application/services/navigation_service.dart';
 import 'package:safe_locations_application/widgets/custom_dialog.dart';
 import 'package:safe_locations_application/widgets/rounded_image.dart';
@@ -260,22 +261,26 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   void _startListeningToLiveLocationUpdates() async {
-    const LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
-    );
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-            (Position? position) async {
-          _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
-          debugPrint('1safeLocations : ${_safeLocation}');
-          await _pageProvider.updateCurrentLocation(_safeLocation!, _auth.user.uid);
-        });
+    // const LocationSettings locationSettings = LocationSettings(
+    //   accuracy: LocationAccuracy.high,
+    //   distanceFilter: 100,
+    // );
+    // positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+    //         (Position? position) async {
+    //       _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
+    //       debugPrint('1safeLocations : ${_safeLocation}');
+    //       await _pageProvider.updateCurrentLocation(_safeLocation!, _auth.user.uid);
+    //     });
+
+    // LocationService().start();
+
   }
 
   void _stopListeningToLiveLocationUpdates() {
-    if (positionStream != null) {
-      positionStream!.cancel();
-    }
+    // if (positionStream != null) {
+    //   positionStream!.cancel();
+    // }
+    // LocationService().stop();
   }
 
   Widget _profileImageField() {
