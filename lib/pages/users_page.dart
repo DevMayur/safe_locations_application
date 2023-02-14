@@ -31,6 +31,7 @@ class _UsersPageState extends State<UsersPage> {
 
 
   final TextEditingController _searchFieldTextEditingController = TextEditingController();
+  final TextEditingController _groupNameFieldTextEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,9 @@ class _UsersPageState extends State<UsersPage> {
               icon: Icons.search,
             ),
             _usersList(),
-            _createChatButton(),
+            (_pageProvider.selectedUsers.length > 1) ? _groupName() : Container(),
+            (_pageProvider.selectedUsers.length > 1 && _pageProvider.groupName != 'no_group') ?_createChatButton() : Container(),
+            (_pageProvider.selectedUsers.length == 1) ?_createChatButton() : Container(),
           ],
         ),
       );
@@ -142,6 +145,19 @@ class _UsersPageState extends State<UsersPage> {
           onPressed: () {
             _pageProvider.createChat();
           }),
+    );
+  }
+
+  Widget _groupName() {
+   return CustomTextField(
+      onEditingComplete: ( _value ) {
+        _pageProvider.setGroupName(name : _value);
+        FocusScope.of(context).unfocus();
+      },
+      hintText: 'Enter group name .. ',
+      obscureText: false,
+      controller: _groupNameFieldTextEditingController,
+      icon: Icons.group_add,
     );
   }
 

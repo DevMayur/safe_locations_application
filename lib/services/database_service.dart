@@ -215,4 +215,14 @@ class DatabaseService {
     }
   }
 
+  void updateGroupName(String uid, String groupName) async {
+    try {
+      await _db.collection(CHAT_COLLECTION).doc(uid).update({
+        "group_name": groupName,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
 }

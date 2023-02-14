@@ -11,9 +11,11 @@ import 'package:provider/provider.dart';
 import 'package:safe_locations_application/models/chat_user.dart';
 import 'package:safe_locations_application/pages/manage_safe_locations_page.dart';
 import 'package:safe_locations_application/provider/update_profile_page_provider.dart';
+import 'package:safe_locations_application/services/location_service.dart';
 import 'package:safe_locations_application/services/navigation_service.dart';
 import 'package:safe_locations_application/widgets/custom_dialog.dart';
 import 'package:safe_locations_application/widgets/rounded_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //services
 import '../services/media_service.dart';
@@ -28,7 +30,6 @@ import '../widgets/rounded_button.dart';
 import '../provider/authentication_provider.dart';
 
 import 'package:safe_locations_application/user_configurations/user_colors.dart';
-import 'package:geolocator/geolocator.dart';
 
 class UpdateProfilePage extends StatefulWidget {
   @override
@@ -59,92 +60,15 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   PlatformFile? _profileImage;
 
   final _registerFormKey = GlobalKey<FormState>();
-  late Position _currentPosition;
-  StreamSubscription<Position>? positionStream = null;
+  // late Position _currentPosition;
+  // StreamSubscription<Position>? positionStream = null;
+  late LocationService _locationService;
 
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
   }
 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    // Test if location services are enabled.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Location services are not enabled don't continue
-      // accessing the position and request users of the
-      // App to enable the location services.
-      return Future.error('Location services are disabled.');
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Permissions are denied, next time you could try
-        // requesting permissions again (this is also where
-        // Android's shouldShowRequestPermissionRationale
-        // returned true. According to Android guidelines
-        // your App should show an explanatory UI now.
-        return Future.error('Location permissions are denied');
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    // When we reach here, permissions are granted and we can
-    // continue accessing the position of the device.
-    return getUserLocation();
-  }
-
-  Future<Position> getUserLocation() async {
-    late Position position;
-    const LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
-    );
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-            (Position? retrivedPosition) {
-              position = retrivedPosition!;
-              debugPrint('Stream gave position : ${retrivedPosition.accuracy}');
-              positionStream?.cancel();
-        });
-
-    try {
-      // Set a timeout of 5 seconds for getting the current position
-      position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high).timeout(Duration(seconds: 5));
-    } on TimeoutException {
-      print('Timed out while getting location');
-    } catch (e) {
-      print('Error while getting location: $e');
-    }
-    _currentPosition = position;
-    return position;
-  }
-
-  _getCurrentLocation() async {
-    try {
-      final position = await _determinePosition().onError((error, stackTrace) {
-        debugPrint('Error determining location $error');
-        return Future.error(error.toString());
-      });
-      _currentPosition = position;
-      debugPrint("location_mayur $_currentPosition");
-      setState(() {
-
-      });
-    } catch (e) {
-      debugPrint("location_mayur $e");
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -155,6 +79,13 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
     _navigation = GetIt.instance.get<NavigationService>();
     _cloudStorageService = GetIt.instance.get<CloudStorageService>();
     _colors = GetIt.instance.get<UserColors>();
+    _locationService = LocationService(_db, _auth);
+    _locationService.init().then((_) {
+      _locationService.isLocationUpdateRunning().then((value) => () {
+        getPreviousValueOfLocationUpdates();
+      });
+    });
+
     return MultiProvider(
         providers: [
           ChangeNotifierProvider<ProfilePageProvider>(create: (_) => ProfilePageProvider(_auth)),
@@ -191,8 +122,11 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       _profileImageField(),
-                      _locationUpdatesSwitch(),
+                      // _locationUpdatesSwitch(),
                     ],
+                  ),
+                  SizedBox(
+                    height: _deviceHeight * 0.05  ,
                   ),
                   _registerForm(),
 
@@ -245,14 +179,15 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
           color: _colors.color_text,
         ),),
         Switch(
-          value: _backgroundLocationUpdatesEnabled, onChanged: (bool value) {
+          value: _backgroundLocationUpdatesEnabled, onChanged: (bool value) async {
           _backgroundLocationUpdatesEnabled = value;
-          setState(() {});
+          await setBackgroundUpdates(value);
           if ( _backgroundLocationUpdatesEnabled ) {
             _startListeningToLiveLocationUpdates();
           } else {
             _stopListeningToLiveLocationUpdates();
           }
+          setState(() {});
         },
         ),
       ],
@@ -260,22 +195,14 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
   }
 
   void _startListeningToLiveLocationUpdates() async {
-    const LocationSettings locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 100,
-    );
-    positionStream = Geolocator.getPositionStream(locationSettings: locationSettings).listen(
-            (Position? position) async {
-          _safeLocation = (position == null ? '0,0' : '${position.latitude.toString()}, ${position.longitude.toString()}');
-          debugPrint('1safeLocations : ${_safeLocation}');
-          await _pageProvider.updateCurrentLocation(_safeLocation!, _auth.user.uid);
-        });
+    _locationService.startLocator();
   }
 
-  void _stopListeningToLiveLocationUpdates() {
-    if (positionStream != null) {
-      positionStream!.cancel();
-    }
+  Future<void> _stopListeningToLiveLocationUpdates() async {
+    // if (positionStream != null) {
+    //   positionStream!.cancel();
+    // }
+    await _locationService.stopLocator();
   }
 
   Widget _profileImageField() {
@@ -373,7 +300,10 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
         name: 'Manage Safe Locations',
         height: _deviceHeight * 0.065,
         width: _deviceWidth * 0.65,
-        onPressed: () {
+        onPressed: () async {
+          debugPrint('safe_location_mayurkakade_ last loc : ');
+          // await _pageProvider.updateCurrentLocation( _locationService.getLocation() , _auth.user.uid );
+          debugPrint('safe_location_mayurkakade_ last loc : ${_user.safeLocation}');
           _navigation.navigateToPage(ManageSafeLocationsPage(
               isUserAtSafeLocation: _isUserAtSafeLocation,
               safeLocation: _user.safeLocation!
@@ -412,5 +342,18 @@ class _UpdateProfilePageState extends State<UpdateProfilePage> {
               _safeLocation!
           );
         });
+  }
+
+  Future<bool> getPreviousValueOfLocationUpdates() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? isLocationEnabled = false;
+    isLocationEnabled = prefs.getBool("UpdatesEnabled");
+    _backgroundLocationUpdatesEnabled = isLocationEnabled!;
+    return _backgroundLocationUpdatesEnabled;
+  }
+
+  Future<void> setBackgroundUpdates(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool("UpdatesEnabled", value);
   }
 }

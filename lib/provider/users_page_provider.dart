@@ -32,6 +32,8 @@ class UsersPageProvider extends ChangeNotifier {
   List<ChatUser>? registeredUsers;
   late List<ChatUser> _selectedUsers;
 
+  String groupName = "no_group";
+
   List<ChatUser> get selectedUsers {
     return _selectedUsers;
   }
@@ -119,6 +121,10 @@ class UsersPageProvider extends ChangeNotifier {
   }
 
   void createChat() async {
+    String _groupName = "no_group";
+    if (selectedUsers.length > 1) {
+      _groupName = groupName;
+    }
     try {
       List<String> _membersIds = _selectedUsers.map((_user) => _user.uid).toList();
       _membersIds.add(_auth.user.uid);
@@ -127,6 +133,7 @@ class UsersPageProvider extends ChangeNotifier {
         "is_group": _isGroup,
         "is_activity": false,
         "members": _membersIds,
+        "group_name" : _groupName,
       });
       //navigate to chat page
       List<ChatUser> _members = [];
@@ -142,6 +149,7 @@ class UsersPageProvider extends ChangeNotifier {
           messages: [],
           members: _members,
           activity: false,
+          groupName: _groupName,
           group: _isGroup)
       );
       _selectedUsers = [];
@@ -188,6 +196,10 @@ class UsersPageProvider extends ChangeNotifier {
 
   void goBack() {
     _navigation.goBack();
+  }
+
+  void setGroupName({required String name}) {
+    groupName = name;
   }
 
 }

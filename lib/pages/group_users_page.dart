@@ -51,6 +51,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
   late GroupUsersPageProvider _pageProvider;
 
   late ScrollController _messagesListViewController;
+  final TextEditingController _groupNameFieldTextEditingController = TextEditingController();
   late UserColors _colors;
 
   @override
@@ -67,7 +68,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
     _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<GroupUsersPageProvider>(create: (_) => GroupUsersPageProvider(_auth, widget.chat.members)),
+        ChangeNotifierProvider<GroupUsersPageProvider>(create: (_) => GroupUsersPageProvider(_auth, widget.chat.members, widget.chat.groupName, widget.chat)),
       ],
       child: _buildUI(),
     );
@@ -102,6 +103,8 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
                   onTap: () {},
                 ),
                 _usersList(),
+                _groupName(),
+                _createChatButton(),
                 // _sendMessageForm(),
               ],
             ),
@@ -151,6 +154,32 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
           );
         }
       }(),
+    );
+  }
+
+  Widget _createChatButton() {
+    return Visibility(
+      visible: widget.chat.members.length > 1,
+      child: RoundedButton(
+          name: "Update chat name",
+          height: _deviceHeight * 0.08,
+          width: _deviceWidth * 0.80,
+          onPressed: () {
+            _pageProvider.updateChatName();
+          }),
+    );
+  }
+
+  Widget _groupName() {
+    return CustomTextField(
+      onEditingComplete: ( _value ) {
+        _pageProvider.setGroupName(name : _value);
+        FocusScope.of(context).unfocus();
+      },
+      hintText: '${widget.chat.groupName}',
+      obscureText: false,
+      controller: _groupNameFieldTextEditingController,
+      icon: Icons.group_add,
     );
   }
 

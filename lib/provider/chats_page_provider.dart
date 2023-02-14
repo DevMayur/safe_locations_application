@@ -71,6 +71,7 @@ class ChatsPageProvider extends ChangeNotifier {
               messages: _messages,
               members: _members,
               activity: _chatData["is_activity"],
+              groupName: _chatData["group_name"],
               group: _chatData["is_group"]);
         }).toList());
         notifyListeners();
