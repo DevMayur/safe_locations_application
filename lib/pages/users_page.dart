@@ -84,7 +84,8 @@ class _UsersPageState extends State<UsersPage> {
             ),
             _usersList(),
             (_pageProvider.selectedUsers.length > 1) ? _groupName() : Container(),
-            _createChatButton(),
+            (_pageProvider.selectedUsers.length > 1 && _pageProvider.groupName != 'no_group') ?_createChatButton() : Container(),
+            (_pageProvider.selectedUsers.length == 1) ?_createChatButton() : Container(),
           ],
         ),
       );
