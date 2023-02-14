@@ -1,12 +1,16 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:safe_locations_application/models/chat_message.dart';
+
+import '../models/safe_location.dart';
 
 const String USER_COLLECTION = "Users";
 const String CHAT_COLLECTION = "Chats";
 const String MESSAGES_COLLECTION = "messages";
+const String SAFE_LOCATIONS_COLLECTION = "safe_locations";
 
 class DatabaseService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -16,6 +20,10 @@ class DatabaseService {
   Future<DocumentSnapshot> getUser( String _uid )
   {
     return _db.collection(USER_COLLECTION).doc(_uid).get();
+  }
+
+  Future<Stream<DocumentSnapshot<Map<String, dynamic>>>> listenToUser( String _uid ) async {
+    return await _db.collection(USER_COLLECTION).doc(_uid).snapshots();
   }
 
   Future<QuerySnapshot> getUsers( {String? name} )
@@ -31,6 +39,7 @@ class DatabaseService {
     debugPrint("Mayur Returned QuerySnapshot");
     return _query.get();
   }
+
 
   Stream<QuerySnapshot> getChatsForUser(String _uid) {
     return _db.collection(CHAT_COLLECTION).where('members', arrayContains: _uid).snapshots();
@@ -121,13 +130,16 @@ class DatabaseService {
 
   Future<void> createUser(String _uid, String _name, String _imageURL, String _phone) async {
     try {
+      List<String> strArr = [];
       await _db.collection(USER_COLLECTION).doc(_uid).set({
         "uid": _uid,
         "name": _name,
         "phone": _phone,
         "image": _imageURL,
         "last_active": DateTime.now().toUtc(),
-        "safe_location": -2,
+        "safe_location": '0,0',
+        "safe_locations": strArr,
+        "location_labels": strArr,
       });
     } catch(e) {
       print(e);
@@ -142,6 +154,71 @@ class DatabaseService {
         "image": _imageURL,
         "last_active": DateTime.now().toUtc(),
         "safe_location": _safeLocation,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  Future<void> addIntoSafeLocations( String userId , String label, String location, List<String> safeLocations, List<String> safeLocationLabels) async {
+    try {
+      if (safeLocations.isNotEmpty) {
+        safeLocations.add(location);
+      } else {
+        safeLocations = [location];
+      }
+
+      if (safeLocationLabels.isNotEmpty) {
+        safeLocationLabels.add(label);
+      } else {
+        safeLocationLabels = [label];
+      }
+
+      await _db.collection(USER_COLLECTION).doc(userId)
+          .update({
+        "safe_locations" : safeLocations,
+        "location_labels" : safeLocationLabels,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  Future<QuerySnapshot> getSafeLocations({required String uid}) async {
+    Query _query = await _db.collection( USER_COLLECTION ).doc(uid).collection(SAFE_LOCATIONS_COLLECTION);
+    return _query.get();
+  }
+
+  Future<List<SafeLocation>?> getLocations(String uid) async {
+    List<SafeLocation> locations;
+    try {
+      await getSafeLocations( uid: uid ).then((_snapshot) {
+        locations = _snapshot.docs.map((_doc) {
+          Map<String, dynamic> _data = _doc.data() as Map<String, dynamic>;
+          _data["documentId"] = _doc.id;
+          return SafeLocation.fromJSON(_data);
+        }).toList();
+        return locations;
+      });
+    } catch (e) {
+      debugPrint(e.toString());
+    }
+  }
+
+  Future<void> updateSafeLocation(String safeLocation, String uid) async {
+    try {
+      await _db.collection(USER_COLLECTION).doc(uid).update({
+        "safe_location": safeLocation,
+      });
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  void updateGroupName(String uid, String groupName) async {
+    try {
+      await _db.collection(CHAT_COLLECTION).doc(uid).update({
+        "group_name": groupName,
       });
     } catch(e) {
       print(e);

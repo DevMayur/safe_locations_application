@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:safe_locations_application/user_configurations/user_strings.dart';
 
 //Pages
 import './pages/splash_page.dart';
@@ -39,7 +40,7 @@ class MainApp extends StatelessWidget {
           },),
       ],
       child: MaterialApp(
-        title: 'Safe Location',
+        title: UserStrings.appName(),
         theme: ThemeData(
           backgroundColor: _colors.background_color,
           scaffoldBackgroundColor: _colors.background_color,

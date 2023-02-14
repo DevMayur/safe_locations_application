@@ -4,6 +4,8 @@ import 'package:get_it/get_it.dart';
 
 //providers
 import 'package:provider/provider.dart';
+import 'package:safe_locations_application/pages/group_users_page.dart';
+import 'package:safe_locations_application/services/navigation_service.dart';
 
 //widgets
 import '../provider/authentication_provider.dart';
@@ -39,6 +41,7 @@ class _ChatPageState extends State<ChatPage> {
 
   late AuthenticationProvider _auth;
   late ChatPageProvider _pageProvider;
+  late NavigationService _navigation;
 
   late GlobalKey<FormState> _messageFormState;
   late ScrollController _messagesListViewController;
@@ -57,6 +60,7 @@ class _ChatPageState extends State<ChatPage> {
     _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
     _colors = GetIt.instance.get<UserColors>();
+    _navigation = GetIt.instance.get<NavigationService>();
     return MultiProvider(
         providers: [
       ChangeNotifierProvider<ChatPageProvider>(
@@ -105,6 +109,9 @@ class _ChatPageState extends State<ChatPage> {
                       _pageProvider.goBack();
                     },
                   ),
+                  onTap: () {
+                    _navigation.navigateToPage(GroupUsersPage(chat: widget.chat));
+                  },
                 ),
                 _messagesListView(),
                 _sendMessageForm(),

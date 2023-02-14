@@ -10,6 +10,8 @@ import '../services/database_service.dart';
 
 import 'package:get_it/get_it.dart';
 
+import '../user_configurations/user_strings.dart';
+
 class SplashPage extends StatefulWidget {
   final VoidCallback onInitializationComplete;
 
@@ -38,7 +40,7 @@ class _SplashPageState extends State<SplashPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'SafeLocation',
+      title: UserStrings.appName(),
       theme: ThemeData(
         backgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
         scaffoldBackgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
@@ -89,8 +91,8 @@ class _SplashPageState extends State<SplashPage> {
         color_text: Colors.black,
         color_input: Colors.white,
         button_color: Color.fromRGBO(0, 82, 218, 1.0),
-        button_safe: Color.fromRGBO(0, 82, 218, 1.0),
-        button_unsafe: Color.fromRGBO(0, 82, 218, 1.0),
+        button_safe: Colors.green,
+        button_unsafe: Colors.red,
         message_background:Colors.lightGreen ,
       navigation_bar_icons:Color.fromRGBO(0, 82, 218, 1.0),
       navigation_bar_background:Color.fromRGBO(161, 161, 161, 1.0),

@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 //services
 import '../services/database_service.dart';
@@ -18,6 +19,7 @@ import '../models/chat_user.dart';
 
 //pages
 import '../pages/chat_page.dart';
+import 'package:fast_contacts/fast_contacts.dart';
 
 class UsersPageProvider extends ChangeNotifier {
 
@@ -27,7 +29,10 @@ class UsersPageProvider extends ChangeNotifier {
   late NavigationService _navigation;
 
   List<ChatUser>? users;
+  List<ChatUser>? registeredUsers;
   late List<ChatUser> _selectedUsers;
+
+  String groupName = "no_group";
 
   List<ChatUser> get selectedUsers {
     return _selectedUsers;
@@ -38,6 +43,7 @@ class UsersPageProvider extends ChangeNotifier {
     _database = GetIt.instance.get<DatabaseService>();
     _navigation = GetIt.instance.get<NavigationService>();
     getUsers();
+    getRegisteredContacts();
   }
 
   @override
@@ -45,8 +51,50 @@ class UsersPageProvider extends ChangeNotifier {
     super.dispose();
   }
 
+  void getRegisteredContacts({String? name}) async {
+    await Permission.contacts.request();
+    final List<Contact> _contacts = await FastContacts.allContacts;
+    _selectedUsers = [];
+    try {
+      _database.getUsers( name: name ).then((_snapshot) {
+        registeredUsers = _snapshot.docs.map((_doc) {
+          Map<String, dynamic> _data = _doc.data() as Map<String, dynamic>;
+          _data["uid"] = _doc.id;
+          return ChatUser.fromJSON(_data);
+        }).toList();
+
+        List<String> numbersList = [];
+        for ( Contact contact in _contacts ) {
+          for (String number in contact.phones) {
+            numbersList.add(number);
+          }
+        }
+
+        List<ChatUser>? tempUsers = List.from(registeredUsers!);
+
+        String ownNumber = _auth.user.phone;
+
+        for (ChatUser user in tempUsers) {
+          if (user.phone == ownNumber) {
+            registeredUsers?.remove(user);
+          }
+          if (!checkNumber(user,numbersList)) {
+            registeredUsers?.remove(user);
+            debugPrint('removed_____ ${user.phone}');
+          } else {
+            debugPrint('not removed_____ ${user.phone}');
+          }
+        }
+
+        notifyListeners();
+      });
+    } catch (e) {
+      debugPrint("Mayur Error getting users");
+      debugPrint(e.toString());
+    }
+  }
+
   void getUsers({String? name}) async {
-    debugPrint("Mayur $name");
     _selectedUsers = [];
     try {
       _database.getUsers( name: name ).then((_snapshot) {
@@ -73,6 +121,10 @@ class UsersPageProvider extends ChangeNotifier {
   }
 
   void createChat() async {
+    String _groupName = "no_group";
+    if (selectedUsers.length > 1) {
+      _groupName = groupName;
+    }
     try {
       List<String> _membersIds = _selectedUsers.map((_user) => _user.uid).toList();
       _membersIds.add(_auth.user.uid);
@@ -81,6 +133,7 @@ class UsersPageProvider extends ChangeNotifier {
         "is_group": _isGroup,
         "is_activity": false,
         "members": _membersIds,
+        "group_name" : _groupName,
       });
       //navigate to chat page
       List<ChatUser> _members = [];
@@ -96,6 +149,7 @@ class UsersPageProvider extends ChangeNotifier {
           messages: [],
           members: _members,
           activity: false,
+          groupName: _groupName,
           group: _isGroup)
       );
       _selectedUsers = [];
@@ -104,6 +158,48 @@ class UsersPageProvider extends ChangeNotifier {
     } catch(e) {
       debugPrint(e.toString());
     }
+  }
+
+  bool checkNumber(ChatUser user, List<String> numbersList) {
+    return contactContains(numbersList, user.phone);
+  }
+
+  bool contactContains( List<String> numberList, String number ) {
+    for (String num in numberList) {
+      if( newString(number
+          .replaceAll(' ', '')
+          .replaceAll('+', ' ')
+          .replaceAll('-', '')
+          .replaceAll('(', '')
+          .replaceAll(')', ''), 10)
+       ==
+          ( newString(num
+              .replaceAll('+', '')
+              .replaceAll(' ', '')
+              .replaceAll('-', '')
+              .replaceAll('(', '')
+              .replaceAll(')', ''), 10) ) )
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  String newString(String oldString, int n) {
+    if (oldString.length >= n) {
+      return oldString.substring(oldString.length - n);
+    } else {
+      return oldString;
+    }
+  }
+
+  void goBack() {
+    _navigation.goBack();
+  }
+
+  void setGroupName({required String name}) {
+    groupName = name;
   }
 
 }

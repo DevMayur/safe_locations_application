@@ -47,10 +47,12 @@ class ChatsPageProvider extends ChangeNotifier {
           List<ChatUser> _members = [];
           for (var _uid in _chatData["members"]) {
             DocumentSnapshot _userSnapshot = await _db.getUser(_uid);
-            Map<String, dynamic> _userData =
-                _userSnapshot.data() as Map<String, dynamic>;
-            _userData["uid"] = _userSnapshot.id;
-            _members.add(ChatUser.fromJSON(_userData));
+            if (_userSnapshot != null && _userSnapshot.data() != null) {
+              Map<String, dynamic> _userData =
+              _userSnapshot.data() as Map<String, dynamic>;
+              _userData["uid"] = _userSnapshot.id;
+              _members.add(ChatUser.fromJSON(_userData));
+            }
           }
 
           //Get last message For chat
@@ -69,6 +71,7 @@ class ChatsPageProvider extends ChangeNotifier {
               messages: _messages,
               members: _members,
               activity: _chatData["is_activity"],
+              groupName: _chatData["group_name"],
               group: _chatData["is_group"]);
         }).toList());
         notifyListeners();

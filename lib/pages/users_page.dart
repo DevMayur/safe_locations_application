@@ -31,6 +31,7 @@ class _UsersPageState extends State<UsersPage> {
 
 
   final TextEditingController _searchFieldTextEditingController = TextEditingController();
+  final TextEditingController _groupNameFieldTextEditingController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -69,10 +70,11 @@ class _UsersPageState extends State<UsersPage> {
                   _auth.logOut();
                 },
               ),
+              onTap: () {},
             ),
             CustomTextField(
               onEditingComplete: ( _value ) {
-                _pageProvider.getUsers(name : _value);
+                _pageProvider.getRegisteredContacts(name : _value);
                 FocusScope.of(context).unfocus();
               },
               hintText: 'Search',
@@ -81,7 +83,9 @@ class _UsersPageState extends State<UsersPage> {
               icon: Icons.search,
             ),
             _usersList(),
-            _createChatButton(),
+            (_pageProvider.selectedUsers.length > 1) ? _groupName() : Container(),
+            (_pageProvider.selectedUsers.length > 1 && _pageProvider.groupName != 'no_group') ?_createChatButton() : Container(),
+            (_pageProvider.selectedUsers.length == 1) ?_createChatButton() : Container(),
           ],
         ),
       );
@@ -89,7 +93,7 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   Widget _usersList() {
-    List<ChatUser>? _users = _pageProvider.users;
+    List<ChatUser>? _users = _pageProvider.registeredUsers;
     return Expanded(
       child: () {
         if(_users != null) {
@@ -102,7 +106,7 @@ class _UsersPageState extends State<UsersPage> {
                       title: _users[_index].name,
                       subtitle: "Last Active: ${_users[_index].lastDayActive()}",
                       imagePath: _users[_index].imageURL,
-                      isActive: _users[_index].wasRecentlyActive(),
+                      isActive: _users[_index].isAtSafeLocation(),
                       isSelected: _pageProvider.selectedUsers.contains(_users[_index]),
                       onTap: () {
                         _pageProvider.updateSelectedUsers(_users[_index]);
@@ -141,6 +145,19 @@ class _UsersPageState extends State<UsersPage> {
           onPressed: () {
             _pageProvider.createChat();
           }),
+    );
+  }
+
+  Widget _groupName() {
+   return CustomTextField(
+      onEditingComplete: ( _value ) {
+        _pageProvider.setGroupName(name : _value);
+        FocusScope.of(context).unfocus();
+      },
+      hintText: 'Enter group name .. ',
+      obscureText: false,
+      controller: _groupNameFieldTextEditingController,
+      icon: Icons.group_add,
     );
   }
 

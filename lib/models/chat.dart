@@ -4,6 +4,7 @@ import '../models/chat_message.dart';
 class Chat {
   final String uid;
   final String currentUserUid;
+  final String groupName;
   final bool activity;
   final bool group;
   final List<ChatUser> members;
@@ -13,6 +14,7 @@ class Chat {
   Chat({
     required this.uid,
     required this.currentUserUid,
+    required this.groupName,
     required this.messages,
     required this.members,
     required this.activity,
@@ -28,7 +30,7 @@ class Chat {
   String title() {
     return !group
         ? _recpients.first.name
-        : _recpients.map((_user) => _user.name).join(",");
+        : groupName;
   }
 
   String imageURL() {

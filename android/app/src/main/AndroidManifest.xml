@@ -5,6 +5,11 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
@@ -12,9 +17,25 @@
         tools:ignore="ScopedStorage" />
 
    <application
-        android:label="safe_locations_application"
+        android:label="Venit"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
+
+       <service android:name="yukams.app.background_locator_2.IsolateHolderService"
+           android:permission="android.permission.FOREGROUND_SERVICE"
+           android:exported="true"
+           android:stopWithTask="true"
+           android:foregroundServiceType = "location"/>
+
+       <service android:name="yukams.app.background_locator_2.LocatorService"
+           android:permission="android.permission.BIND_JOB_SERVICE"
+           android:exported="true"
+           android:stopWithTask="true"/>
+
+       <meta-data
+           android:name="flutterEmbedding"
+           android:value="2" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

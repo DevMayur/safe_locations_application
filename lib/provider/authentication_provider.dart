@@ -22,15 +22,19 @@ class AuthenticationProvider extends ChangeNotifier {
     _databaseService = GetIt.instance.get<DatabaseService>();
     _auth.authStateChanges().listen((_user) {
       if (_user != null) {
+        debugPrint('mayurkakade__ $_user');
         user = ChatUser.fromJSON({
           "uid": _auth.currentUser?.uid,
           "name": "--",
           "phone": _auth.currentUser?.phoneNumber,
           "image": "dafault",
           "last_active": Timestamp.now(),
-          "safe_location": "-1,-1",
+          "safe_location": "0,0",
+          "safe_locations": [],
+          "location_labels": [],
         });
         _databaseService.updateUserLastSeenTime(_user.uid);
+        debugPrint('mayurkakade__ ${_user.phoneNumber}');
         _databaseService.getUser(_user.uid).then(
           (_snapshot) {
             _databaseService
@@ -38,7 +42,7 @@ class AuthenticationProvider extends ChangeNotifier {
                 .then((userExist) {
               if (!userExist) {
                 print('user not exist');
-                _navigationService.removeAndNavigateToRoute('/login');
+                _navigationService.removeAndNavigateToRoute('/register');
               } else {
                 print('user exist');
                 _navigationService.removeAndNavigateToRoute('/home');
@@ -57,7 +61,7 @@ class AuthenticationProvider extends ChangeNotifier {
       {required Function onCodeSent}) async {
     try {
       await _auth.verifyPhoneNumber(
-        phoneNumber: "+91$_phone",
+        phoneNumber: _phone,
         verificationCompleted: (PhoneAuthCredential credential) async {
           await _auth.signInWithCredential(credential).then((value) {
             print("You are logged in successfully");
@@ -86,9 +90,13 @@ class AuthenticationProvider extends ChangeNotifier {
       if (_auth.currentUser != null) {
         _databaseService.getUser(_auth.currentUser!.uid).then((_snapshot) {
           if (_snapshot != null && _snapshot.exists) {
-            print(_snapshot);
             onLoginCompleted(true);
-        }});
+          }
+          else
+          {
+            onLoginCompleted(false);
+          }
+        });
       } else {
         onLoginCompleted(false);
       }

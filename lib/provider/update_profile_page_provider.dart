@@ -29,7 +29,6 @@ class ProfilePageProvider extends ChangeNotifier {
   ChatUser? _user;
 
   ChatUser? getUser() {
-    debugPrint("Mayur user requested");
     return _user != null ? _user : null;
   }
 
@@ -55,6 +54,8 @@ class ProfilePageProvider extends ChangeNotifier {
           "image": _snapshot["image"],
           "last_active": Timestamp.now(),
           "safe_location": _snapshot["safe_location"],
+          "safe_locations": _snapshot["safe_locations"],
+          "location_labels": _snapshot["location_labels"],
         });
         debugPrint("Mayur {update_profile_page_provider} snapshot user ${_user?.name}");
         notifyListeners();
@@ -64,6 +65,14 @@ class ProfilePageProvider extends ChangeNotifier {
       debugPrint("Mayur Error getting users");
       debugPrint(e.toString());
     }
+  }
+
+  void updateSafeLocations() {
+    _getUser();
+  }
+
+  Future<void> updateCurrentLocation(String safeLocation, String uid) async {
+    await _database.updateSafeLocation(safeLocation, uid);
   }
 
 
