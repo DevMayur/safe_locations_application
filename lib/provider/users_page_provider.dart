@@ -1,6 +1,7 @@
 import 'dart:async';
 
 //packages
+import 'package:contacts_service/contacts_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +20,6 @@ import '../models/chat_user.dart';
 
 //pages
 import '../pages/chat_page.dart';
-import 'package:fast_contacts/fast_contacts.dart';
 
 class UsersPageProvider extends ChangeNotifier {
 
@@ -53,7 +53,7 @@ class UsersPageProvider extends ChangeNotifier {
 
   void getRegisteredContacts({String? name}) async {
     await Permission.contacts.request();
-    final List<Contact> _contacts = await FastContacts.allContacts;
+    final List<Contact> _contacts = await ContactsService.getContacts();
     _selectedUsers = [];
     try {
       _database.getUsers( name: name ).then((_snapshot) {
@@ -64,9 +64,15 @@ class UsersPageProvider extends ChangeNotifier {
         }).toList();
 
         List<String> numbersList = [];
-        for ( Contact contact in _contacts ) {
-          for (String number in contact.phones) {
-            numbersList.add(number);
+        for (Contact contact in _contacts) {
+          List<Item>? phones = contact.phones;
+          if (phones != null) {
+            for (Item phone in phones) {
+              String? number = phone.value;
+              if (number != null) {
+                numbersList.add(number);
+              }
+            }
           }
         }
 
@@ -200,6 +206,11 @@ class UsersPageProvider extends ChangeNotifier {
 
   void setGroupName({required String name}) {
     groupName = name;
+  }
+
+  createContact() async {
+    await ContactsService.openContactForm();
+    notifyListeners();
   }
 
 }

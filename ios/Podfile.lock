@@ -609,6 +609,8 @@ PODS:
     - firebase_core
     - Flutter
     - nanopb (< 2.30910.0, >= 2.30908.0)
+  - contacts_service (0.2.2):
+    - Flutter
   - DKImagePickerController/Core (4.3.4):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -640,8 +642,6 @@ PODS:
   - DKPhotoGallery/Resource (0.0.17):
     - SDWebImage
     - SwiftyGif
-  - fast_contacts (0.0.1):
-    - Flutter
   - file_picker (0.0.1):
     - DKImagePickerController/PhotoGallery
     - Flutter
@@ -862,7 +862,7 @@ PODS:
 DEPENDENCIES:
   - background_locator_2 (from `.symlinks/plugins/background_locator_2/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
-  - fast_contacts (from `.symlinks/plugins/fast_contacts/ios`)
+  - contacts_service (from `.symlinks/plugins/contacts_service/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -911,8 +911,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/background_locator_2/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
-  fast_contacts:
-    :path: ".symlinks/plugins/fast_contacts/ios"
+  contacts_service:
+    :path: ".symlinks/plugins/contacts_service/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   firebase_analytics:
@@ -945,9 +945,9 @@ SPEC CHECKSUMS:
   background_locator_2: 2a860721c64d9b0f1600991dd8e7c786cff79785
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 5e5bb98722f66e820bf1aa7b3c98ffc9b2450ffb
+  contacts_service: 849e1f84281804c8bfbec1b4c3eedcb23c5d3eca
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
-  fast_contacts: d5f0da976a40f8fd07a9ff730c2e9bee8c3898dd
   file_picker: ce3938a0df3cc1ef404671531facef740d03f920
   Firebase: f92fc551ead69c94168d36c2b26188263860acd9
   firebase_analytics: 9f3a4cb560a59976b2c48707abae2d4cb94bcb3a

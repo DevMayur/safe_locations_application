@@ -48,7 +48,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSContactsUsageDescription</key>
-	<string>Location Needed</string>
+	<string>Contacts Needed</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Location Needed</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

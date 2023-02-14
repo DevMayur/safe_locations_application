@@ -71,6 +71,14 @@ class _UsersPageState extends State<UsersPage> {
                 },
               ),
               onTap: () {},
+              secondaryAction: IconButton(
+                icon: const Icon(Icons.contact_mail_outlined),
+                color: const Color.fromRGBO(0, 82, 218, 1.0),
+                onPressed: () async {
+                  await _pageProvider.createContact();
+                  setState(() {});
+                },
+              ),
             ),
             CustomTextField(
               onEditingComplete: ( _value ) {

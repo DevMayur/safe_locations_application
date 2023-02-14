@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fast_contacts/fast_contacts.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:safe_locations_application/models/chat_message.dart';
 

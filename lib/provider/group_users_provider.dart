@@ -19,7 +19,6 @@ import '../models/chat_user.dart';
 
 //pages
 import '../pages/chat_page.dart';
-import 'package:fast_contacts/fast_contacts.dart';
 
 class GroupUsersPageProvider extends ChangeNotifier {
 
