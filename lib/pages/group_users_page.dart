@@ -103,8 +103,10 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
                   onTap: () {},
                 ),
                 _usersList(),
-                _groupName(),
-                _createChatButton(),
+                widget.chat.group ?
+                _groupName() : Container(),
+                widget.chat.group ?
+                _createChatButton() : Container(),
                 // _sendMessageForm(),
               ],
             ),
