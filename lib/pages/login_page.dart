@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:provider/provider.dart';
 import 'package:safe_locations_application/services/database_service.dart';
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
 import 'package:safe_locations_application/user_configurations/user_strings.dart';
 
 //widgets
@@ -29,6 +30,7 @@ class _LoginPageState extends State<LoginPage> {
 
   late AuthenticationProvider _auth;
   late NavigationService _navigation;
+  late UserColors _colors;
   late DatabaseService _db;
 
   String? _phone;
@@ -48,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
     _auth = Provider.of<AuthenticationProvider>(context);
     _db = GetIt.instance.get<DatabaseService>();
     _navigation = GetIt.instance.get<NavigationService>();
+    _colors = GetIt.instance.get<UserColors>();
     return _buildUI();
   }
 
@@ -86,9 +89,9 @@ class _LoginPageState extends State<LoginPage> {
       child: Text(
         UserStrings.appName(),
         style: TextStyle(
-          color: Colors.white,
+          color: _colors.heading_color,
           fontSize: 40,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w600,
         ),
       ),
     );

@@ -98,6 +98,7 @@ class CustomUpdateTextFormField extends StatelessWidget {
   final String text;
   final String hintText;
   final bool obscureText;
+  late UserColors _colors;
 
   CustomUpdateTextFormField({
     required this.onSaved,
@@ -109,19 +110,22 @@ class CustomUpdateTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    _colors = GetIt.instance.get<UserColors>();
     return TextFormField(
       initialValue: text,
       onSaved: (_value) => {
         onSaved(_value!)
       },
       cursorColor: Colors.white,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(
+          color: _colors.color_text
+      ),
       obscureText: obscureText,
       // validator: (_value) {
       //   return RegExp(regEx).hasMatch(_value!) ? null : 'Enter a valid value';
       // },
       decoration: InputDecoration(
-          fillColor: const Color.fromRGBO(30, 29, 37, 1.0),
+          fillColor: _colors.text_boxes,
           filled: true,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10.0),

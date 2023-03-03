@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:get_it/get_it.dart';
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
 
 //providers
 import '../provider/authentication_provider.dart';
@@ -33,11 +34,14 @@ class _UsersPageState extends State<UsersPage> {
   final TextEditingController _searchFieldTextEditingController = TextEditingController();
   final TextEditingController _groupNameFieldTextEditingController = TextEditingController();
 
+  late UserColors _colors;
+
   @override
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
     _auth = Provider.of<AuthenticationProvider>(context);
+    _colors = GetIt.instance.get<UserColors>();
     return MultiProvider(
       providers: [
         ChangeNotifierProvider<UsersPageProvider>(create: (_) => UsersPageProvider(_auth)),
@@ -65,7 +69,7 @@ class _UsersPageState extends State<UsersPage> {
               "Users",
               primaryAction: IconButton(
                 icon: const Icon(Icons.logout),
-                color: const Color.fromRGBO(0, 82, 218, 1.0),
+                color: _colors.heading_color,
                 onPressed: () {
                   _auth.logOut();
                 },
@@ -73,7 +77,7 @@ class _UsersPageState extends State<UsersPage> {
               onTap: () {},
               secondaryAction: IconButton(
                 icon: const Icon(Icons.contact_mail_outlined),
-                color: const Color.fromRGBO(0, 82, 218, 1.0),
+                color: _colors.heading_color,
                 onPressed: () async {
                   await _pageProvider.createContact();
                   setState(() {});

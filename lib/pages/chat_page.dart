@@ -97,14 +97,14 @@ class _ChatPageState extends State<ChatPage> {
                   fontSize: 12,
                   primaryAction: IconButton(
                     icon: Icon(Icons.delete,
-                      color: _colors.button_color,
+                      color: _colors.heading_color,
                     ),
                     onPressed: () {
                       _pageProvider.deleteChat();
                     },
                   ),
                   secondaryAction: IconButton(
-                    icon: Icon(Icons.arrow_back, color: _colors.button_color,),
+                    icon: Icon(Icons.arrow_back, color: _colors.heading_color,),
                     onPressed: () {
                       _pageProvider.goBack();
                     },

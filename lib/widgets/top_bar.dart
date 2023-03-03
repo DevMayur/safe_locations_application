@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
+import 'package:safe_locations_application/user_configurations/user_colors.dart';
 
 class TopBar extends StatelessWidget {
   String _barTitle;
@@ -6,6 +8,7 @@ class TopBar extends StatelessWidget {
   Widget? secondaryAction;
   double? fontSize;
   Function onTap;
+  late UserColors _colors;
 
   late double _deviceHeight;
   late double _deviceWidth;
@@ -21,6 +24,7 @@ class TopBar extends StatelessWidget {
   Widget build(BuildContext context) {
     _deviceHeight = MediaQuery.of(context).size.height;
     _deviceWidth = MediaQuery.of(context).size.width;
+    _colors = GetIt.instance.get<UserColors>();
     return _buildUI();
   }
 
@@ -50,7 +54,7 @@ class TopBar extends StatelessWidget {
         _barTitle,
         overflow: TextOverflow.ellipsis,
         style: TextStyle(
-            color: Colors.white, fontSize: fontSize, fontWeight: FontWeight.w700),
+            color: _colors.heading_color, fontSize: fontSize, fontWeight: FontWeight.w700),
       ),
     );
   }

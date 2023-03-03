@@ -95,7 +95,7 @@ class _GroupUsersPageState extends State<GroupUsersPage> {
                   widget.chat.title(),
                   fontSize: 12,
                   secondaryAction: IconButton(
-                    icon: Icon(Icons.arrow_back, color: _colors.button_color,),
+                    icon: Icon(Icons.arrow_back, color: _colors.heading_color,),
                     onPressed: () {
                       _pageProvider.goBack();
                     },

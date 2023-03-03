@@ -2,6 +2,8 @@ import 'dart:ui';
 
 class UserColors {
   Color background_color;
+  Color heading_color;
+  Color text_boxes;
   Color color_primary;
   Color color_text;
   Color color_input;
@@ -14,6 +16,8 @@ class UserColors {
 
   UserColors({
     required this.background_color,
+    required this.heading_color,
+    required this.text_boxes,
     required this.color_primary,
     required this.color_text,
     required this.color_input,

@@ -27,6 +27,9 @@ class SplashPage extends StatefulWidget {
 }
 
 class _SplashPageState extends State<SplashPage> {
+  Color _backgroundColor = Color.fromRGBO(192, 187, 178, 1.0);
+  Color _headingColor = Color.fromRGBO(68, 145, 101, 1.0);
+  Color _textBoxColor = Color.fromRGBO(40, 129, 138, 1.0);
   @override
   void initState() {
     super.initState();
@@ -42,8 +45,8 @@ class _SplashPageState extends State<SplashPage> {
     return MaterialApp(
       title: UserStrings.appName(),
       theme: ThemeData(
-        backgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
-        scaffoldBackgroundColor: const Color.fromRGBO(36, 35, 49, 1.0),
+        backgroundColor: _backgroundColor,
+        scaffoldBackgroundColor: _backgroundColor,
       ),
       home: Scaffold(
         body: Center(
@@ -86,10 +89,12 @@ class _SplashPageState extends State<SplashPage> {
     );
 
     UserColors userColors = UserColors(
-        background_color: Color.fromRGBO(218, 218, 218, 1.0),
+        background_color: _backgroundColor,
+        heading_color: _headingColor,
+        text_boxes: _textBoxColor,
         color_primary: Color.fromRGBO(92, 140, 217, 1.0),
         color_text: Colors.black,
-        color_input: Colors.white,
+        color_input: _textBoxColor,
         button_color: Color.fromRGBO(0, 82, 218, 1.0),
         button_safe: Colors.green,
         button_unsafe: Colors.red,
